@@ -1,13 +1,13 @@
-public import Async_Primitives
+public import Async
 internal import Buffer_Primitive
 public import Buffer_Ring_Bounded_Primitive
 public import Buffer_Ring_Primitive
-internal import Buffer_Ring_Primitives
-internal import Cardinal_Primitives
-public import Column_Primitives
+internal import Buffer_Ring
+internal import Cardinal
+public import Column
 internal import Memory_Allocator_Primitive
-internal import Memory_Heap_Primitives
-public import Storage_Contiguous_Primitives
+internal import Memory_Heap
+public import Storage_Contiguous
 
 extension Async.Stream.Replay {
 

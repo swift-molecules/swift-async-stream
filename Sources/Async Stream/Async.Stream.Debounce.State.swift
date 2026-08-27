@@ -1,6 +1,6 @@
-public import Async_Primitives
+public import Async
 internal import Clocks_Dependencies
-public import Ownership_Primitives
+public import Ownership
 
 extension Async.Stream.Debounce {
 

@@ -1,4 +1,4 @@
-public import Async_Primitives
+public import Async
 internal import Standard_Library_Extensions
 
 extension Async.Stream.Combine {

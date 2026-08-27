@@ -1,4 +1,4 @@
-public import Ownership_Primitives
+public import Ownership
 
 extension Ownership.Mutable.Unchecked where Value: AsyncIteratorProtocol {
 

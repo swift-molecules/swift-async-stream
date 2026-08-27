@@ -1,5 +1,5 @@
-public import Async_Primitives
-public import Ownership_Primitives
+public import Async
+public import Ownership
 
 extension Async.Stream.Prefix {
 

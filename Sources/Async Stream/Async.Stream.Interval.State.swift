@@ -1,4 +1,4 @@
-public import Async_Primitives
+public import Async
 internal import Clocks_Dependencies
 
 extension Async.Stream.Interval where Element == Int {

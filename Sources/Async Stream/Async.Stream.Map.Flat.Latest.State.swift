@@ -1,13 +1,13 @@
-public import Async_Primitives
+public import Async
 internal import Buffer_Primitive
 internal import Buffer_Ring_Bounded_Primitive
 import Buffer_Ring_Primitive
-import Column_Primitives
+import Column
 internal import Memory_Allocator_Primitive
-internal import Memory_Heap_Primitives
-public import Ownership_Primitives
+internal import Memory_Heap
+public import Ownership
 internal import Standard_Library_Extensions
-import Storage_Contiguous_Primitives
+import Storage_Contiguous
 
 extension Async.Stream.Map.Flat {
 

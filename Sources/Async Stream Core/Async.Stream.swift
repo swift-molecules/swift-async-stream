@@ -1,5 +1,5 @@
-public import Async_Primitives
-internal import Ownership_Primitives
+public import Async
+internal import Ownership
 
 extension Async {
 

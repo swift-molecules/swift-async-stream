@@ -35,44 +35,44 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-async-primitives.git",
+            url: "https://github.com/swift-molecules/swift-async.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-column-primitives.git",
+            url: "https://github.com/swift-molecules/swift-column.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-buffer-ring-primitives.git",
+            url: "https://github.com/swift-molecules/swift-buffer-ring.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-buffer-primitives.git",
+            url: "https://github.com/swift-molecules/swift-buffer.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-queue-primitives.git",
+            url: "https://github.com/swift-molecules/swift-queue.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-reference-primitives.git",
+            url: "https://github.com/swift-molecules/swift-reference.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
+            url: "https://github.com/swift-molecules/swift-standard-library-extensions.git",
             branch: "main"
         ),
-        .package(url: "https://github.com/swift-foundations/swift-clocks.git", branch: "main"),
+        .package(url: "https://github.com/swift-compositions/swift-clocks.git", branch: "main"),
         .package(
-            url: "https://github.com/swift-foundations/swift-clocks-dependencies.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-primitives/swift-memory-heap-primitives.git",
+            url: "https://github.com/swift-compositions/swift-clocks-dependencies.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-storage-primitives.git",
+            url: "https://github.com/swift-molecules/swift-memory-heap.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-molecules/swift-storage.git",
             branch: "main"
         ),
     ],
@@ -80,41 +80,41 @@ let package = Package(
         .target(
             name: "Async Sequence",
             dependencies: [
-                .product(name: "Async Primitives", package: "swift-async-primitives")
+                .product(name: "Async", package: "swift-async")
             ]
         ),
 
         .target(
             name: "Async Stream Core",
             dependencies: [
-                .product(name: "Async Primitives", package: "swift-async-primitives"),
-                .product(name: "Buffer Primitives", package: "swift-buffer-primitives"),
-                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
+                .product(name: "Async", package: "swift-async"),
+                .product(name: "Buffer", package: "swift-buffer"),
+                .product(name: "Queue", package: "swift-queue"),
                 .product(name: "Clocks", package: "swift-clocks"),
-                .product(name: "Reference Primitives", package: "swift-reference-primitives"),
+                .product(name: "Reference", package: "swift-reference"),
             ]
         ),
 
         .target(
             name: "Async Stream",
             dependencies: [
-                .product(name: "Column Primitives", package: "swift-column-primitives"),
-                .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
+                .product(name: "Column", package: "swift-column"),
+                .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring"),
                 .product(
                     name: "Buffer Ring Bounded Primitive",
-                    package: "swift-buffer-ring-primitives"
+                    package: "swift-buffer-ring"
                 ),
                 "Async Stream Core",
-                .product(name: "Buffer Ring Primitives", package: "swift-buffer-ring-primitives"),
+                .product(name: "Buffer Ring", package: "swift-buffer-ring"),
                 .product(name: "Clocks Dependencies", package: "swift-clocks-dependencies"),
                 .product(
                     name: "Standard Library Extensions",
                     package: "swift-standard-library-extensions"
                 ),
-                .product(name: "Memory Heap Primitives", package: "swift-memory-heap-primitives"),
+                .product(name: "Memory Heap", package: "swift-memory-heap"),
                 .product(
-                    name: "Storage Contiguous Primitives",
-                    package: "swift-storage-primitives"
+                    name: "Storage Contiguous",
+                    package: "swift-storage"
                 ),
             ]
         ),
@@ -122,7 +122,7 @@ let package = Package(
         .target(
             name: "Async Fanout",
             dependencies: [
-                .product(name: "Async Primitives", package: "swift-async-primitives")
+                .product(name: "Async", package: "swift-async")
             ]
         ),
 

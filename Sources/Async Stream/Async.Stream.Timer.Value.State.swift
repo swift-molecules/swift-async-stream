@@ -1,4 +1,4 @@
-public import Async_Primitives
+public import Async
 internal import Clocks_Dependencies
 
 extension Async.Stream.Timer.Value {

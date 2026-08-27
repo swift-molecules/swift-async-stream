@@ -42,7 +42,7 @@ for await line in merged {
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-foundations/swift-async.git", branch: "main")
+    .package(url: "https://github.com/swift-compositions/swift-async.git", branch: "main")
 ]
 ```
 

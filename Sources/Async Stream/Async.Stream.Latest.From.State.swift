@@ -1,5 +1,5 @@
-public import Async_Primitives
-public import Ownership_Primitives
+public import Async
+public import Ownership
 internal import Standard_Library_Extensions
 
 extension Async.Stream.Latest {

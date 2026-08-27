@@ -1,14 +1,14 @@
-public import Async_Primitives
+public import Async
 internal import Buffer_Primitive
 internal import Buffer_Ring_Bounded_Primitive
 internal import Buffer_Ring_Primitive
 public import Clocks
 internal import Clocks_Dependencies
-internal import Column_Primitives
+internal import Column
 internal import Memory_Allocator_Primitive
-internal import Memory_Heap_Primitives
-public import Ownership_Primitives
-internal import Storage_Contiguous_Primitives
+internal import Memory_Heap
+public import Ownership
+internal import Storage_Contiguous
 
 extension Async.Stream.Buffer.Time {
 

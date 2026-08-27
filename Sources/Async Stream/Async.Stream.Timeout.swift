@@ -1,6 +1,6 @@
-public import Async_Primitives
+public import Async
 internal import Clocks_Dependencies
-internal import Ownership_Primitives
+internal import Ownership
 
 extension Async.Stream {
 
