@@ -1,11 +1,12 @@
+import Async_Stream
 import Async
 import Clocks_Dependencies
 import Testing
 
-extension `Async.Stream Tests`.Unit {
+extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
 
     @Test
-    func `delay preserves all elements`() async {
+    func `Delay preserves all elements`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -19,7 +20,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `delay preserves element order`() async {
+    func `Delay preserves element order`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -33,7 +34,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `delay on empty stream completes immediately`() async {
+    func `Delay on empty stream completes immediately`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -47,7 +48,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `interval emits sequential integers`() async {
+    func `Interval emits sequential integers`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -61,7 +62,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `interval starts at zero`() async {
+    func `Interval starts at zero`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -75,7 +76,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `timer emits once then completes`() async {
+    func `Timer emits once then completes`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -89,7 +90,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `timer with value emits value once`() async {
+    func `Timer with value emits value once`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -103,7 +104,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `throttle emits first and suppresses rapid followers`() async {
+    func `Throttle emits first and suppresses rapid followers`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -118,7 +119,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `throttle on single element emits it`() async {
+    func `Throttle on single element emits it`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -132,7 +133,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `throttle on empty stream completes`() async {
+    func `Throttle on empty stream completes`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -146,7 +147,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `repeating with interval emits value N times`() async {
+    func `Repeating with interval emits value N times`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -160,7 +161,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `repeating with interval and zero count emits nothing`() async {
+    func `Repeating with interval and zero count emits nothing`() async {
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
@@ -174,7 +175,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `repeating emits value N times`() async {
+    func `Repeating emits value N times`() async {
         let stream = Async.Stream.repeating(42, count: 4)
         var results: [Int] = []
         for await value in stream {
@@ -184,7 +185,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `repeating with zero count emits nothing`() async {
+    func `Repeating with zero count emits nothing`() async {
         let stream = Async.Stream.repeating(42, count: 0)
         var count = 0
         for await _ in stream {

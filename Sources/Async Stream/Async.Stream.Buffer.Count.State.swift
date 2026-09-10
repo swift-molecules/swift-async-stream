@@ -1,14 +1,14 @@
 public import Async
-internal import Buffer_Primitive
+internal import Buffer
 public import Buffer_Ring_Bounded_Primitive
 public import Buffer_Ring_Primitive
 internal import Buffer_Ring
 internal import Cardinal
 public import Column
-internal import Memory_Allocator_Primitive
-internal import Memory_Heap
+internal import Memory_Allocator
+internal import Memory
 public import Ownership
-public import Storage_Contiguous
+public import Storage_Memory
 
 extension Async.Stream.Buffer.Count {
 

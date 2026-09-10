@@ -1,3 +1,4 @@
+import Async_Stream
 import Async
 import Testing
 
@@ -36,10 +37,10 @@ private func withDeadline<T: Sendable>(
     }
 }
 
-extension `Async.Stream Tests`.`Edge Case` {
+extension `Async streams preserve values across composed operations`.`Stream operations preserve boundary behavior` {
 
     @Test(.timeLimit(.minutes(2)))
-    func `merge resumes a suspended consumer instead of hanging when its task is cancelled`()
+    func `Merge resumes a suspended consumer instead of hanging when its task is cancelled`()
         async throws
     {
 
@@ -59,7 +60,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `replay resumes a suspended consumer instead of hanging when its task is cancelled`()
+    func `Replay resumes a suspended consumer instead of hanging when its task is cancelled`()
         async throws
     {
 
@@ -78,7 +79,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `merge cancels both producer tasks when its iterator is dropped without exhausting`()
+    func `Merge cancels both producer tasks when its iterator is dropped without exhausting`()
         async throws
     {
         let flagA = `Lifecycle Flag`()
@@ -105,7 +106,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `share cancels upstream forwarding once the shared stream is totally abandoned`()
+    func `Share cancels upstream forwarding once the shared stream is totally abandoned`()
         async throws
     {
         let flag = `Lifecycle Flag`()
@@ -124,7 +125,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `replay cancels upstream forwarding once the replay stream is totally abandoned`()
+    func `Replay cancels upstream forwarding once the replay stream is totally abandoned`()
         async throws
     {
         let flag = `Lifecycle Flag`()
@@ -143,7 +144,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `replay subscription count returns to zero after N consumers churn through`() async throws
+    func `Replay subscription count returns to zero after N consumers churn through`() async throws
     {
         let (replayed, subscriptionCount) = Async.Stream.from([1, 2, 3, 4, 5]).replayForTesting(
             bufferSize: 4
@@ -166,7 +167,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `replay preserves per-subscriber delivery order under contention`() async throws {
+    func `Replay preserves per-subscriber delivery order under contention`() async throws {
         let count = 500
         let upstream = Async.Stream.from(Array(0..<count))
         let replayed = upstream.replay(bufferSize: 8)
@@ -180,7 +181,7 @@ extension `Async.Stream Tests`.`Edge Case` {
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `replay delivers a fast pre-subscribed burst in strict send order with no drops`()
+    func `Replay delivers a fast pre-subscribed burst in strict send order with no drops`()
         async throws
     {
         let elementCount = 2_000

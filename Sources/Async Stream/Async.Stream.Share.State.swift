@@ -1,3 +1,4 @@
+public import Async_Broadcast
 public import Async
 
 extension Async.Stream.Share {

@@ -1,11 +1,11 @@
 public import Async
-internal import Buffer_Primitive
+internal import Buffer
 internal import Buffer_Ring_Bounded_Primitive
 import Buffer_Ring_Primitive
 import Column
-internal import Memory_Allocator_Primitive
-internal import Memory_Heap
-import Storage_Contiguous
+internal import Memory_Allocator
+internal import Memory
+import Storage_Memory
 
 extension Async.Stream.Combine {
 

@@ -1,18 +1,19 @@
+import Async_Stream
 import Async
 import Testing
 
 @Suite
-struct `Async.Stream Tests` {
-    @Suite struct Unit {}
-    @Suite struct `Edge Case` {}
-    @Suite struct Integration {}
-    @Suite(.serialized) struct Performance {}
+struct `Async streams preserve values across composed operations` {
+    @Suite struct `Stream operations preserve their basic behavior` {}
+    @Suite struct `Stream operations preserve boundary behavior` {}
+    @Suite struct `Stream operations compose with their dependencies` {}
+    @Suite(.serialized) struct `Stream operations preserve values during repeated execution` {}
 }
 
-extension `Async.Stream Tests`.Unit {
+extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
 
     @Test
-    func `from creates stream from sequence`() async {
+    func `From creates stream from sequence`() async {
         let stream = Async.Stream.from([1, 2, 3])
         var results: [Int] = []
 
@@ -24,7 +25,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `just emits single value`() async {
+    func `Just emits single value`() async {
         let stream = Async.Stream.just(42)
         var results: [Int] = []
 
@@ -36,7 +37,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `empty completes immediately`() async {
+    func `An empty stream completes immediately`() async {
         let stream = Async.Stream<Int>.empty
         var count = 0
 
@@ -48,7 +49,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `unfold generates from state`() async {
+    func `Unfold generates from state`() async {
         let fib = Async.Stream.unfold((0, 1)) { state -> (Int, (Int, Int))? in
             let value = state.0
             if value > 5 { return nil }
@@ -64,7 +65,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `map transforms elements`() async {
+    func `Stream mapping transforms every element`() async {
         let stream = Async.Stream.from([1, 2, 3])
             .map { $0 * 2 }
 
@@ -77,7 +78,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `filter removes elements`() async {
+    func `Stream filtering removes rejected elements`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5])
             .filter { $0 % 2 == 0 }
 
@@ -90,7 +91,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `compactMap transforms and filters`() async {
+    func `CompactMap transforms and filters`() async {
         let stream = Async.Stream.from(["1", "two", "3"])
             .map.compact { Int($0) }
 
@@ -103,7 +104,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `flatMap concatenates inner streams`() async {
+    func `FlatMap concatenates inner streams`() async {
         let stream = Async.Stream.from([1, 2, 3])
             .map.flat { n in
                 Async.Stream.from([n, n * 10])
@@ -118,7 +119,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `scan accumulates values`() async {
+    func `Stream scanning accumulates successive values`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5])
             .scan(0) { $0 + $1 }
 
@@ -131,7 +132,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `reduce to single value`() async {
+    func `Reduce to single value`() async {
         let sum = await Async.Stream.from([1, 2, 3, 4, 5])
             .reduce(0) { $0 + $1 }
 
@@ -139,7 +140,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `concat joins streams`() async {
+    func `Stream concatenation joins its inputs in order`() async {
         let a = Async.Stream.from([1, 2])
         let b = Async.Stream.from([3, 4])
         let stream = Async.Stream.concat(a, b)
@@ -153,7 +154,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `zip pairs elements`() async {
+    func `Stream zipping pairs corresponding elements`() async {
         let a = Async.Stream.from([1, 2, 3])
         let b = Async.Stream.from(["a", "b", "c"])
         let stream = a.zip(b)
@@ -170,7 +171,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `prefix takes first N elements`() async {
+    func `Prefix takes first N elements`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5]).prefix(3)
 
         var results: [Int] = []
@@ -182,7 +183,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `prefix while takes until predicate fails`() async {
+    func `Prefix while takes until predicate fails`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5]).prefix.while { $0 < 4 }
 
         var results: [Int] = []
@@ -194,7 +195,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `drop skips first N elements`() async {
+    func `Drop skips first N elements`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5]).drop(2)
 
         var results: [Int] = []
@@ -206,7 +207,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `drop while skips until predicate fails`() async {
+    func `Drop while skips until predicate fails`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5]).drop.while { $0 < 3 }
 
         var results: [Int] = []
@@ -218,7 +219,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `first returns only first element`() async {
+    func `First returns only first element`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5]).first()
 
         var results: [Int] = []
@@ -230,7 +231,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `last returns only last element`() async {
+    func `Last returns only last element`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5]).last()
 
         var results: [Int] = []
@@ -242,7 +243,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `distinctUntilChanged removes consecutive duplicates`() async {
+    func `DistinctUntilChanged removes consecutive duplicates`() async {
         let stream = Async.Stream.from([1, 1, 2, 2, 2, 3, 1, 1]).distinct.untilChanged()
 
         var results: [Int] = []
@@ -254,7 +255,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `distinctUntilChanged by key`() async {
+    func `Distinct stream values are compared by their selected key`() async {
         let stream = Async.Stream.from([1, -1, 2, -2, 3])
             .distinct.untilChanged(by: { abs($0) })
 

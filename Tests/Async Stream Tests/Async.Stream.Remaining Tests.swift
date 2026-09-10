@@ -1,3 +1,4 @@
+import Async_Stream
 import Async
 import Testing
 
@@ -12,10 +13,10 @@ extension Counter {
     }
 }
 
-extension `Async.Stream Tests`.Unit {
+extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
 
     @Test
-    func `generate creates stream from generator function`() async {
+    func `Generate creates stream from generator function`() async {
         let counter = Counter()
         let stream = Async.Stream<Int>.generate {
             await counter.next()
@@ -30,7 +31,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `never does not emit when cancelled`() async {
+    func `Never does not emit when cancelled`() async {
         let stream = Async.Stream<Int>.never
         let task = Task {
             var count = 0
@@ -43,7 +44,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `async map transforms elements`() async {
+    func `Async map transforms elements`() async {
         let stream = Async.Stream.from([1, 2, 3])
             .map { value async -> String in
                 "\(value)"
@@ -58,7 +59,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `async filter removes elements`() async {
+    func `Async filter removes elements`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5])
             .filter { value async -> Bool in
                 value % 2 == 0
@@ -73,7 +74,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `async compactMap transforms and filters`() async {
+    func `Async compactMap transforms and filters`() async {
         let stream = Async.Stream.from(["1", "two", "3"])
             .map.compact { value async -> Int? in
                 Int(value)
@@ -88,7 +89,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `first where returns first matching element`() async {
+    func `First where returns first matching element`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5])
             .first { $0 > 3 }
 
@@ -101,7 +102,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `first where with no match returns empty`() async {
+    func `First where with no match returns empty`() async {
         let stream = Async.Stream.from([1, 2, 3])
             .first { $0 > 10 }
 
@@ -114,7 +115,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `last where returns last matching element`() async {
+    func `Last where returns last matching element`() async {
         let stream = Async.Stream.from([1, 2, 3, 4, 5])
             .last { $0 < 4 }
 
@@ -127,7 +128,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `last where with no match returns empty`() async {
+    func `Last where with no match returns empty`() async {
         let stream = Async.Stream.from([1, 2, 3])
             .last { $0 > 10 }
 
@@ -140,7 +141,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `distinctUntilChanged with custom equality`() async {
+    func `DistinctUntilChanged with custom equality`() async {
         let stream = Async.Stream.from([1, -1, 2, -2, 3])
             .distinct.untilChanged { abs($0) == abs($1) }
 

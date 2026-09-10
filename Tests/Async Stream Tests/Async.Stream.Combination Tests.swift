@@ -1,10 +1,11 @@
+import Async_Stream
 import Async
 import Testing
 
-extension `Async.Stream Tests`.Unit {
+extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
 
     @Test
-    func `merge combines elements from two streams`() async {
+    func `Merge combines elements from two streams`() async {
         let a = Async.Stream.from([1, 3, 5])
         let b = Async.Stream.from([2, 4, 6])
         let stream = Async.Stream.merge(a, b)
@@ -18,7 +19,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `merge three streams`() async {
+    func `Stream merging delivers values from three inputs`() async {
         let a = Async.Stream.from([1])
         let b = Async.Stream.from([2])
         let c = Async.Stream.from([3])
@@ -33,7 +34,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `merge array of streams`() async {
+    func `Merge array of streams`() async {
         let streams = [
             Async.Stream.from([1, 2]),
             Async.Stream.from([3, 4]),
@@ -50,7 +51,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `merge empty array returns empty stream`() async {
+    func `Merge empty array returns empty stream`() async {
         let stream = Async.Stream<Int>.merge([])
         var count = 0
         for await _ in stream {
@@ -60,7 +61,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `merge with one empty stream`() async {
+    func `Merge with one empty stream`() async {
         let a = Async.Stream.from([1, 2, 3])
         let b = Async.Stream<Int>.empty
         let stream = Async.Stream.merge(a, b)
@@ -74,7 +75,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `concat three streams`() async {
+    func `Stream concatenation delivers three inputs in order`() async {
         let a = Async.Stream.from([1])
         let b = Async.Stream.from([2])
         let c = Async.Stream.from([3])
@@ -89,7 +90,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `concat array of streams preserves order`() async {
+    func `Concat array of streams preserves order`() async {
         let streams = [
             Async.Stream.from([1, 2]),
             Async.Stream.from([3, 4]),
@@ -106,7 +107,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `zip with transform combines elements`() async {
+    func `Zip with transform combines elements`() async {
         let a = Async.Stream.from([1, 2, 3])
         let b = Async.Stream.from([10, 20, 30])
         let stream = a.zip(b) { $0 + $1 }
@@ -120,7 +121,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `zip stops at shorter stream`() async {
+    func `Zip stops at shorter stream`() async {
         let a = Async.Stream.from([1, 2, 3, 4, 5])
         let b = Async.Stream.from(["a", "b"])
         let stream = a.zip(b)
@@ -136,7 +137,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `flatMapLatest switches to latest inner stream`() async {
+    func `FlatMapLatest switches to latest inner stream`() async {
 
         let stream = Async.Stream.from([1, 2, 3])
             .map.flat.latest { n in
@@ -153,7 +154,7 @@ extension `Async.Stream Tests`.Unit {
     }
 
     @Test
-    func `flatMapLatest with single element`() async {
+    func `FlatMapLatest with single element`() async {
         let stream = Async.Stream.from([42])
             .map.flat.latest { n in
                 Async.Stream.from([n, n * 2])

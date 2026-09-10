@@ -1,3 +1,5 @@
+public import Async_Broadcast
+public import Async_Channel
 public import Async
 internal import Ownership
 
