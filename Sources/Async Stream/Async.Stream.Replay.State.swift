@@ -1,20 +1,20 @@
 public import Async
-internal import Buffer
+public import Buffer
 public import Buffer_Ring_Bounded_Primitive
 public import Buffer_Ring_Primitive
 internal import Buffer_Ring
 internal import Cardinal
-public import Column
-internal import Memory_Allocator
-internal import Memory
-public import Storage_Memory
+public import Memory
+public import Memory_Allocator
+public import Storage
+
 
 extension Async.Stream.Replay {
 
     @usableFromInline
     actor State {
         @usableFromInline
-        var ring: Column.Ring<Element>.Bounded
+        var ring: Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded
 
         @usableFromInline
         var subscriptions: [Async.Stream<Element>.Replay.Subscription] = []
@@ -26,7 +26,7 @@ extension Async.Stream.Replay {
         init(bufferSize: Int) {
 
             let capacity = try! Index<Element>.Count(max(1, bufferSize))
-            self.ring = Column.Ring<Element>.Bounded(minimumCapacity: capacity)
+            self.ring = Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded(minimumCapacity: capacity)
         }
     }
 }
