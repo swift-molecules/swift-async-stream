@@ -9,6 +9,7 @@ import Buffer_Ring_Primitive
 import Memory_Allocator_Pool
 import Memory_Pool
 import Memory_Allocator
+public import Memory_Allocator_Protocol
 import Memory
 import Ownership_Shared_Primitive
 import Storage

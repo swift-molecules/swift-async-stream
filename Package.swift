@@ -24,7 +24,7 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-clock.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-clocks.git", branch: "main"),
         .package(url: "https://github.com/swift-compositions/swift-clocks-dependencies.git", branch: "main"),
-        .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main", traits: ["Lock", "Map", "Shared", "Cursor"]),
         .package(url: "https://github.com/swift-molecules/swift-memory-allocation.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-ownership.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-queue.git", branch: "main"),
@@ -34,6 +34,7 @@ let package = Package(
         .package(url: "https://github.com/swift-molecules/swift-buffer-linear.git", branch: "main"),
         .package(url: "https://github.com/swift-molecules/swift-ownership-shared.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-store.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-finite.git", branch: "main", traits: ["Tagged"]),
     ],
     targets: [
         .target(
@@ -52,6 +53,7 @@ let package = Package(
                 .product(name: "Clocks Dependencies", package: "swift-clocks-dependencies"),
                 .product(name: "Memory", package: "swift-memory"),
                 .product(name: "Memory Allocator", package: "swift-memory-allocation"),
+                .product(name: "Memory Allocator Protocol", package: "swift-memory-allocation"),
                 .product(name: "Ownership", package: "swift-ownership"),
                 .product(name: "Queue", package: "swift-queue"),
                 .product(name: "Reference", package: "swift-reference"),
