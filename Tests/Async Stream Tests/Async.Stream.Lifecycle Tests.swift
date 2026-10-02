@@ -12,10 +12,10 @@ private actor `Lifecycle Flag` {
 
 extension `Lifecycle Flag` {
 
-    func waitUntilSet(attempts: Int = 200, interval: Duration = .milliseconds(10)) async -> Bool {
+    func waitUntilSet(attempts: Int = 100_000) async -> Bool {
         for _ in 0..<attempts {
             if isSet { return true }
-            try? await Task.sleep(for: interval)
+            await Task.yield()
         }
         return isSet
     }
@@ -52,7 +52,7 @@ extension `Async streams preserve values across composed operations`.`Stream ope
             for await _ in merged {}
         }
 
-        try await Task.sleep(for: .milliseconds(50))
+        for _ in 0..<1_000 { await Task.yield() }
         consumer.cancel()
 
         let finished = await withDeadline { await consumer.value }
@@ -71,7 +71,7 @@ extension `Async streams preserve values across composed operations`.`Stream ope
             for await _ in replayed {}
         }
 
-        try await Task.sleep(for: .milliseconds(50))
+        for _ in 0..<1_000 { await Task.yield() }
         consumer.cancel()
 
         let finished = await withDeadline { await consumer.value }
@@ -157,10 +157,10 @@ extension `Async streams preserve values across composed operations`.`Stream ope
         }
 
         var finalCount = -1
-        for _ in 0..<200 {
+        for _ in 0..<100_000 {
             finalCount = await subscriptionCount()
             if finalCount == 0 { break }
-            try? await Task.sleep(for: .milliseconds(10))
+            await Task.yield()
         }
 
         #expect(finalCount == 0)
@@ -203,9 +203,9 @@ extension `Async streams preserve values across composed operations`.`Stream ope
                 return results
             }
 
-            for _ in 0..<200 {
+            for _ in 0..<100_000 {
                 if await subscriptionCount() >= 1 { break }
-                try? await Task.sleep(for: .milliseconds(5))
+                await Task.yield()
             }
 
             for value in 0..<elementCount {
