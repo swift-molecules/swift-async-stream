@@ -63,7 +63,7 @@ extension Async.Stream.Distinct.State {
 extension Async.Stream.Distinct where Element: Equatable {
 
     public func untilChanged() -> Async.Stream<Element> {
-        untilChanged(==)
+        untilChanged { $0 == $1 }
     }
 }
 

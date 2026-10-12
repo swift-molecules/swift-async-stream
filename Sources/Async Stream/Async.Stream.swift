@@ -56,7 +56,7 @@ extension Async.Stream {
         from([value])
     }
 
-    public static func from<S: Swift.Sequence & Sendable>(_ sequence: S) -> Self
+    public static func from<S: Swift::Sequence & Sendable>(_ sequence: S) -> Self
     where S.Element == Element {
         Self {
             let state = State(Array(sequence))

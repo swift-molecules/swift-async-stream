@@ -94,8 +94,8 @@ extension `Async streams preserve values across composed operations`.`Stream ope
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
-            let stream = Async.Stream<Swift.String>.timer(after: .seconds(1), value: "hello")
-            var results: [Swift.String] = []
+            let stream = Async.Stream<Swift::String>.timer(after: .seconds(1), value: "hello")
+            var results: [Swift::String] = []
             for await value in stream {
                 results.append(value)
             }
@@ -151,8 +151,8 @@ extension `Async streams preserve values across composed operations`.`Stream ope
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
-            let stream = Async.Stream<Swift.String>.repeating("ping", every: .seconds(1), count: 3)
-            var results: [Swift.String] = []
+            let stream = Async.Stream<Swift::String>.repeating("ping", every: .seconds(1), count: 3)
+            var results: [Swift::String] = []
             for await value in stream {
                 results.append(value)
             }
@@ -165,7 +165,7 @@ extension `Async streams preserve values across composed operations`.`Stream ope
         await withDependencies {
             $0.clock = Clock.`Any`(Clock.Immediate())
         } operation: {
-            let stream = Async.Stream<Swift.String>.repeating("ping", every: .seconds(1), count: 0)
+            let stream = Async.Stream<Swift::String>.repeating("ping", every: .seconds(1), count: 0)
             var count = 0
             for await _ in stream {
                 count += 1

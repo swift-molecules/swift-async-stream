@@ -4,6 +4,9 @@ import Testing
 
 private actor `Lifecycle Flag` {
     private(set) var isSet = false
+}
+
+extension `Lifecycle Flag` {
 
     func set() {
         isSet = true
@@ -55,7 +58,7 @@ extension `Async streams preserve values across composed operations`.`Stream ope
         for _ in 0..<1_000 { await Task.yield() }
         consumer.cancel()
 
-        let finished = await withDeadline { await consumer.value }
+        let finished: Void? = await withDeadline { await consumer.value }
         #expect(finished != nil)
     }
 
@@ -74,7 +77,7 @@ extension `Async streams preserve values across composed operations`.`Stream ope
         for _ in 0..<1_000 { await Task.yield() }
         consumer.cancel()
 
-        let finished = await withDeadline { await consumer.value }
+        let finished: Void? = await withDeadline { await consumer.value }
         #expect(finished != nil)
     }
 
@@ -217,7 +220,7 @@ extension `Async streams preserve values across composed operations`.`Stream ope
             let expected = Array(0..<elementCount)
 
             if let results {
-                let firstBad = (0..<Swift.min(results.count, expected.count)).first {
+                let firstBad = (0..<Swift::min(results.count, expected.count)).first {
                     results[$0] != expected[$0]
                 }
                 let detail =
