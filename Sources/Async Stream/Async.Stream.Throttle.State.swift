@@ -1,6 +1,6 @@
 public import Async
-public import Clock_Concurrency
 public import Clock
+public import Clock_Concurrency
 public import Ownership
 
 extension Async.Stream.Throttle {
