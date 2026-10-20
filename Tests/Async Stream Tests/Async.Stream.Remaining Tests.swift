@@ -1,5 +1,5 @@
-import Async_Stream
 import Async
+import Async_Stream
 import Testing
 
 private actor Counter {
@@ -13,7 +13,9 @@ extension Counter {
     }
 }
 
-extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
+extension `Async streams preserve values across composed operations`
+    .`Stream operations preserve their basic behavior`
+{
 
     @Test
     func `Generate creates stream from generator function`() async {

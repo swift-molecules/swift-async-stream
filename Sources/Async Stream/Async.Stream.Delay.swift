@@ -4,7 +4,10 @@ internal import Ownership
 
 extension Async.Stream {
 
-    public func delay(_ duration: Duration, clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()) -> Self {
+    public func delay(
+        _ duration: Duration,
+        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
+    ) -> Self {
         let clock = Clock.`Any`(clock)
         return Self { [self] in
             let box = Async.Stream<Element>.Iterator.Box(makeAsyncIterator())

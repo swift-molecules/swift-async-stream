@@ -1,21 +1,21 @@
 public import Async
 internal import Buffer
+import Buffer
+import Buffer_Linear_Bounded_Primitive
+import Buffer_Linear_Primitive
 internal import Buffer_Ring_Bounded_Primitive
 import Buffer_Ring_Primitive
 public import Clock_Concurrency
-import Buffer
-import Buffer_Linear_Primitive
-import Buffer_Linear_Bounded_Primitive
+import Memory
+internal import Memory
+import Memory_Allocator
+internal import Memory_Allocator
 import Memory_Allocator_Pool
 import Memory_Pool
-import Memory_Allocator
-import Memory
+public import Ownership
 import Ownership_Shared_Primitive
 import Storage
 import Store
-internal import Memory_Allocator
-internal import Memory
-public import Ownership
 
 extension Async.Stream.Buffer.Window {
 
@@ -43,7 +43,12 @@ extension Async.Stream.Buffer.Window {
         let clock: Clock.`Any`<Duration>
 
         @usableFromInline
-        init(stream: Async.Stream<Element>, count: Int, duration: Duration, clock: Clock.`Any`<Duration>) {
+        init(
+            stream: Async.Stream<Element>,
+            count: Int,
+            duration: Duration,
+            clock: Clock.`Any`<Duration>
+        ) {
             self.clock = clock
             self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.count = max(1, count)

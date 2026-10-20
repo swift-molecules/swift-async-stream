@@ -1,5 +1,5 @@
-public import Async_Broadcast
 import Async
+public import Async_Broadcast
 
 extension Async.Stream.Share {
 

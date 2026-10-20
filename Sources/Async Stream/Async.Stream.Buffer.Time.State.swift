@@ -1,18 +1,18 @@
 public import Async
 internal import Buffer
+internal import Buffer_Linear_Bounded_Primitive
+internal import Buffer_Linear_Primitive
 internal import Buffer_Ring_Bounded_Primitive
 internal import Buffer_Ring_Primitive
 public import Clock_Concurrency
-internal import Buffer_Linear_Primitive
-internal import Buffer_Linear_Bounded_Primitive
+internal import Memory
+internal import Memory_Allocator
 internal import Memory_Allocator_Pool
 internal import Memory_Pool
-internal import Memory_Allocator
-internal import Memory
+public import Ownership
 internal import Ownership_Shared_Primitive
 internal import Storage
 internal import Store
-public import Ownership
 
 extension Async.Stream.Buffer.Time {
 

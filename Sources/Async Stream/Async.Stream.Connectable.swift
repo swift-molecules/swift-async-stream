@@ -1,5 +1,5 @@
-public import Async_Broadcast
 import Async
+public import Async_Broadcast
 internal import Ownership
 
 extension Async.Stream {

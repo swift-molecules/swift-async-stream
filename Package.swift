@@ -12,27 +12,51 @@ let package = Package(
         .visionOS(.v27),
     ],
     products: [
-        .library(name: "Async Stream", targets: ["Async Stream"]),
+        .library(name: "Async Stream", targets: ["Async Stream"])
     ],
     dependencies: [
         .package(url: "https://github.com/swift-atoms/swift-async.git", branch: "main"),
-        .package(url: "https://github.com/swift-molecules/swift-async-broadcast.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-molecules/swift-async-broadcast.git",
+            branch: "main"
+        ),
         .package(url: "https://github.com/swift-molecules/swift-async-channel.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-buffer.git", branch: "main"),
         .package(url: "https://github.com/swift-molecules/swift-buffer-ring.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-cardinal.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-clock.git", branch: "main"),
-        .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main", traits: ["Lock", "Map", "Shared", "Cursor"]),
-        .package(url: "https://github.com/swift-molecules/swift-memory-allocation.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-atoms/swift-memory.git",
+            branch: "main",
+            traits: ["Lock", "Map", "Shared", "Cursor"]
+        ),
+        .package(
+            url: "https://github.com/swift-molecules/swift-memory-allocation.git",
+            branch: "main"
+        ),
         .package(url: "https://github.com/swift-atoms/swift-ownership.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-queue.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-reference.git", branch: "main"),
-        .package(url: "https://github.com/swift-atoms/swift-standard-library-extensions.git", branch: "main"),
-        .package(url: "https://github.com/swift-atoms/swift-storage.git", branch: "main", traits: ["Generational", "Memory"]),
+        .package(
+            url: "https://github.com/swift-atoms/swift-standard-library-extensions.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-atoms/swift-storage.git",
+            branch: "main",
+            traits: ["Generational", "Memory"]
+        ),
         .package(url: "https://github.com/swift-molecules/swift-buffer-linear.git", branch: "main"),
-        .package(url: "https://github.com/swift-molecules/swift-ownership-shared.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-molecules/swift-ownership-shared.git",
+            branch: "main"
+        ),
         .package(url: "https://github.com/swift-atoms/swift-store.git", branch: "main"),
-        .package(url: "https://github.com/swift-atoms/swift-finite.git", branch: "main", traits: ["Tagged"]),
+        .package(
+            url: "https://github.com/swift-atoms/swift-finite.git",
+            branch: "main",
+            traits: ["Tagged"]
+        ),
     ],
     targets: [
         .target(
@@ -54,7 +78,10 @@ let package = Package(
                 .product(name: "Ownership", package: "swift-ownership"),
                 .product(name: "Queue", package: "swift-queue"),
                 .product(name: "Reference", package: "swift-reference"),
-                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
+                .product(
+                    name: "Standard Library Extensions",
+                    package: "swift-standard-library-extensions"
+                ),
                 .product(name: "Storage", package: "swift-storage"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear"),
                 .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear"),
@@ -79,14 +106,15 @@ let package = Package(
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    target.swiftSettings = (target.swiftSettings ?? []) + [
-        .strictMemorySafety(),
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-        .enableUpcomingFeature("InferIsolatedConformances"),
-        .enableExperimentalFeature("Lifetimes"),
-        .treatAllWarnings(as: .error),
-    ]
+    target.swiftSettings =
+        (target.swiftSettings ?? []) + [
+            .strictMemorySafety(),
+            .enableUpcomingFeature("ExistentialAny"),
+            .enableUpcomingFeature("InternalImportsByDefault"),
+            .enableUpcomingFeature("MemberImportVisibility"),
+            .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+            .enableUpcomingFeature("InferIsolatedConformances"),
+            .enableExperimentalFeature("Lifetimes"),
+            .treatAllWarnings(as: .error),
+        ]
 }

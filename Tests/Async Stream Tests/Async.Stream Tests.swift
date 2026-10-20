@@ -1,5 +1,5 @@
-import Async_Stream
 import Async
+import Async_Stream
 import Testing
 
 @Suite
@@ -10,7 +10,9 @@ struct `Async streams preserve values across composed operations` {
     @Suite(.serialized) struct `Stream operations preserve values during repeated execution` {}
 }
 
-extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
+extension `Async streams preserve values across composed operations`
+    .`Stream operations preserve their basic behavior`
+{
 
     @Test
     func `From creates stream from sequence`() async {

@@ -1,5 +1,5 @@
-import Async_Stream
 import Async
+import Async_Stream
 import Testing
 
 private actor `Lifecycle Flag` {
@@ -40,7 +40,9 @@ private func withDeadline<T: Sendable>(
     }
 }
 
-extension `Async streams preserve values across composed operations`.`Stream operations preserve boundary behavior` {
+extension `Async streams preserve values across composed operations`
+    .`Stream operations preserve boundary behavior`
+{
 
     @Test(.timeLimit(.minutes(2)))
     func `Merge resumes a suspended consumer instead of hanging when its task is cancelled`()

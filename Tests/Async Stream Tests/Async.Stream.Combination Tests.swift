@@ -1,8 +1,10 @@
-import Async_Stream
 import Async
+import Async_Stream
 import Testing
 
-extension `Async streams preserve values across composed operations`.`Stream operations preserve their basic behavior` {
+extension `Async streams preserve values across composed operations`
+    .`Stream operations preserve their basic behavior`
+{
 
     @Test
     func `Merge combines elements from two streams`() async {
