@@ -1,6 +1,6 @@
 public import Async
+public import Clock_Concurrency
 public import Clock
-internal import Clocks_Dependencies
 public import Ownership
 
 extension Async.Stream.Throttle {
@@ -17,7 +17,11 @@ extension Async.Stream.Throttle {
         var lastEmitTime: Clock.`Any`<Duration>.Instant?
 
         @usableFromInline
-        init(stream: Async.Stream<Element>, duration: Duration) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(stream: Async.Stream<Element>, duration: Duration, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.duration = duration
         }
@@ -27,7 +31,6 @@ extension Async.Stream.Throttle {
 extension Async.Stream.Throttle.State {
     @usableFromInline
     func next() async -> Element? {
-        @Dependency(\.clock) var clock
         while true {
             guard let element = await box.next() else { return nil }
 

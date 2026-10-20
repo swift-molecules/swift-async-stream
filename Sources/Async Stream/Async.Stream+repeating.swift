@@ -1,4 +1,5 @@
 public import Async
+internal import Clock_Concurrency
 
 extension Async.Stream {
 
@@ -17,13 +18,15 @@ extension Async.Stream {
     public static func repeating(
         _ value: Element,
         every interval: Duration,
-        count: Int? = nil
+        count: Int? = nil,
+        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
     ) -> Self {
         Self {
             let state = Async.Stream<Element>.Repeat.Interval.State(
                 value: value,
                 interval: interval,
-                count: count
+                count: count,
+                clock: Clock.`Any`(clock)
             )
             return Iterator {
                 await state.next()

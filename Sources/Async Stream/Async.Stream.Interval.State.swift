@@ -1,5 +1,5 @@
 public import Async
-internal import Clocks_Dependencies
+public import Clock_Concurrency
 
 extension Async.Stream.Interval where Element == Int {
 
@@ -15,7 +15,11 @@ extension Async.Stream.Interval where Element == Int {
         var started: Bool = false
 
         @usableFromInline
-        init(duration: Duration) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(duration: Duration, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.duration = duration
         }
     }
@@ -24,7 +28,6 @@ extension Async.Stream.Interval where Element == Int {
 extension Async.Stream.Interval.State {
     @usableFromInline
     func next() async -> Int? {
-        @Dependency(\.clock) var clock
         if Task.isCancelled { return nil }
 
         if started {

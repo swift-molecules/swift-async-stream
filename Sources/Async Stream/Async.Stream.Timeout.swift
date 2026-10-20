@@ -1,15 +1,15 @@
 public import Async
-internal import Clocks_Dependencies
+internal import Clock_Concurrency
 internal import Ownership
 
 extension Async.Stream {
 
-    public func timeout(_ duration: Duration) -> Self {
-        Self { [self] in
+    public func timeout(_ duration: Duration, clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()) -> Self {
+        let clock = Clock.`Any`(clock)
+        return Self { [self] in
             let box = Async.Stream<Element>.Iterator.Box(makeAsyncIterator())
 
             return Iterator {
-                @Dependency(\.clock) var clock
                 let resolvedClock = clock
                 do {
                     return try await withThrowingTaskGroup(of: Element?.self) { group in

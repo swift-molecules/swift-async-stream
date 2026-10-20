@@ -1,5 +1,5 @@
 public import Async
-internal import Clocks_Dependencies
+public import Clock_Concurrency
 public import Ownership
 
 extension Async.Stream.Debounce {
@@ -19,7 +19,11 @@ extension Async.Stream.Debounce {
         var upstreamDone: Bool = false
 
         @usableFromInline
-        init(stream: Async.Stream<Element>, duration: Duration) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(stream: Async.Stream<Element>, duration: Duration, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.duration = duration
         }
@@ -29,7 +33,6 @@ extension Async.Stream.Debounce {
 extension Async.Stream.Debounce.State {
     @usableFromInline
     func next() async -> Element? {
-        @Dependency(\.clock) var clock
         let resolvedClock = clock
         if upstreamDone {
 

@@ -22,8 +22,6 @@ let package = Package(
         .package(url: "https://github.com/swift-molecules/swift-buffer-ring.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-cardinal.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-clock.git", branch: "main"),
-        .package(url: "https://github.com/swift-compositions/swift-clocks.git", branch: "main"),
-        .package(url: "https://github.com/swift-compositions/swift-clocks-dependencies.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-memory.git", branch: "main", traits: ["Lock", "Map", "Shared", "Cursor"]),
         .package(url: "https://github.com/swift-molecules/swift-memory-allocation.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-ownership.git", branch: "main"),
@@ -49,8 +47,7 @@ let package = Package(
                 .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring"),
                 .product(name: "Cardinal", package: "swift-cardinal"),
                 .product(name: "Clock", package: "swift-clock"),
-                .product(name: "Clocks", package: "swift-clocks"),
-                .product(name: "Clocks Dependencies", package: "swift-clocks-dependencies"),
+                .product(name: "Clock Concurrency", package: "swift-clock"),
                 .product(name: "Memory", package: "swift-memory"),
                 .product(name: "Memory Allocator", package: "swift-memory-allocation"),
                 .product(name: "Memory Allocator Protocol", package: "swift-memory-allocation"),
@@ -72,7 +69,7 @@ let package = Package(
             name: "Async Stream Tests",
             dependencies: [
                 .product(name: "Async", package: "swift-async"),
-                .product(name: "Clocks Dependencies", package: "swift-clocks-dependencies"),
+                .product(name: "Clock Concurrency", package: "swift-clock"),
                 .target(name: "Async Stream"),
             ],
             path: "Tests/Async Stream Tests"

@@ -1,5 +1,5 @@
 public import Async
-internal import Clocks_Dependencies
+public import Clock_Concurrency
 
 extension Async.Stream.Repeat.Interval {
 
@@ -18,7 +18,11 @@ extension Async.Stream.Repeat.Interval {
         var first: Bool = true
 
         @usableFromInline
-        init(value: sending Element, interval: Duration, count: Int?) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(value: sending Element, interval: Duration, count: Int?, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.value = value
             self.interval = interval
             self.remaining = count
@@ -29,7 +33,6 @@ extension Async.Stream.Repeat.Interval {
 extension Async.Stream.Repeat.Interval.State {
     @usableFromInline
     func next() async -> Element? {
-        @Dependency(\.clock) var clock
         if Task.isCancelled { return nil }
         if let r = remaining {
             if r <= 0 { return nil }

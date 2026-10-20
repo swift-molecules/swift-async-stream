@@ -2,8 +2,7 @@ public import Async
 internal import Buffer
 internal import Buffer_Ring_Bounded_Primitive
 import Buffer_Ring_Primitive
-public import Clocks
-internal import Clocks_Dependencies
+public import Clock_Concurrency
 import Buffer
 import Buffer_Linear_Primitive
 import Buffer_Linear_Bounded_Primitive
@@ -41,7 +40,11 @@ extension Async.Stream.Buffer.Window {
         var upstreamDone: Bool = false
 
         @usableFromInline
-        init(stream: Async.Stream<Element>, count: Int, duration: Duration) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(stream: Async.Stream<Element>, count: Int, duration: Duration, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.count = max(1, count)
             self.duration = duration
@@ -52,7 +55,6 @@ extension Async.Stream.Buffer.Window {
 extension Async.Stream.Buffer.Window.State {
     @usableFromInline
     func next() async -> [Element]? {
-        @Dependency(\.clock) var clock
         let resolvedClock = clock
         if upstreamDone && queue.isEmpty {
             return nil

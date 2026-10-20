@@ -1,5 +1,5 @@
 public import Async
-internal import Clocks_Dependencies
+public import Clock_Concurrency
 
 extension Async.Stream.Timer where Element == Void {
 
@@ -12,7 +12,11 @@ extension Async.Stream.Timer where Element == Void {
         var fired: Bool = false
 
         @usableFromInline
-        init(delay: Duration) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(delay: Duration, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.delay = delay
         }
     }
@@ -21,7 +25,6 @@ extension Async.Stream.Timer where Element == Void {
 extension Async.Stream.Timer.State where Element == Void {
     @usableFromInline
     func next() async -> Void? {
-        @Dependency(\.clock) var clock
         if fired { return nil }
         if Task.isCancelled { return nil }
 

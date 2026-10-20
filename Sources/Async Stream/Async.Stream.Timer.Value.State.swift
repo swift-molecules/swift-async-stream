@@ -1,5 +1,5 @@
 public import Async
-internal import Clocks_Dependencies
+public import Clock_Concurrency
 
 extension Async.Stream.Timer.Value {
 
@@ -15,7 +15,11 @@ extension Async.Stream.Timer.Value {
         var fired: Bool = false
 
         @usableFromInline
-        init(delay: Duration, value: sending Element) {
+        let clock: Clock.`Any`<Duration>
+
+        @usableFromInline
+        init(delay: Duration, value: sending Element, clock: Clock.`Any`<Duration>) {
+            self.clock = clock
             self.delay = delay
             self.value = value
         }
@@ -25,7 +29,6 @@ extension Async.Stream.Timer.Value {
 extension Async.Stream.Timer.Value.State {
     @usableFromInline
     func next() async -> Element? {
-        @Dependency(\.clock) var clock
         if fired { return nil }
         if Task.isCancelled { return nil }
 
