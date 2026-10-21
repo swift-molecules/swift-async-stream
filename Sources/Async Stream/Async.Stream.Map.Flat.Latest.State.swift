@@ -67,7 +67,10 @@ extension Async.Stream.Map.Flat.Latest.State {
         while true {
 
             if !queue.isEmpty {
-                return queue.dequeue()!
+                guard let element = queue.dequeue() else {
+                    preconditionFailure("a non-empty queue dequeues an element")
+                }
+                return element
             }
 
             if innerDone && outerDone {

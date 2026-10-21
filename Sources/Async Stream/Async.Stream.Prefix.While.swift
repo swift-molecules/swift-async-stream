@@ -27,11 +27,10 @@ extension Async.Stream.Prefix.While {
     func next() async -> Element? {
         if done { return nil }
         guard let element = await box.next() else { return nil }
-        if predicate(element) {
-            return element
-        } else {
+        guard predicate(element) else {
             done = true
             return nil
         }
+        return element
     }
 }

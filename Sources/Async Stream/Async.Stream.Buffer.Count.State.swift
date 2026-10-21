@@ -20,13 +20,17 @@ extension Async.Stream.Buffer.Count {
         let count: Index<Element>.Count
 
         @usableFromInline
-        var ring:
-            Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded
+        var ring: Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded
 
         @usableFromInline
         init(stream: Async.Stream<Element>, count: Int) {
 
-            let typedCount = try! Index<Element>.Count(max(1, count))
+            let typedCount: Index<Element>.Count
+            do {
+                typedCount = try Index<Element>.Count(max(1, count))
+            } catch {
+                preconditionFailure("a count of at least one is a valid count: \(error)")
+            }
             self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.count = typedCount
             self.ring = Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>

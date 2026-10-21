@@ -53,7 +53,10 @@ extension Async.Stream.Transducer.Run {
     package func next() async -> Output? {
 
         if !queue.isEmpty {
-            return queue.dequeue()!
+            guard let element = queue.dequeue() else {
+                preconditionFailure("a non-empty queue dequeues an element")
+            }
+            return element
         }
 
         while !upstreamDone {

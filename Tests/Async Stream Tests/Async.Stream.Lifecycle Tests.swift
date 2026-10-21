@@ -149,8 +149,7 @@ extension `Async streams preserve values across composed operations`
     }
 
     @Test(.timeLimit(.minutes(2)))
-    func `Replay subscription count returns to zero after N consumers churn through`() async throws
-    {
+    func `Replay subscription count returns to zero after N consumers churn through`() async throws {
         let (replayed, subscriptionCount) = Async.Stream.from([1, 2, 3, 4, 5]).replayForTesting(
             bufferSize: 4
         )

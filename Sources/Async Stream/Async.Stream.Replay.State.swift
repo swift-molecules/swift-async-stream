@@ -13,8 +13,7 @@ extension Async.Stream.Replay {
     @usableFromInline
     actor State {
         @usableFromInline
-        var ring:
-            Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded
+        var ring: Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded
 
         @usableFromInline
         var subscriptions: [Async.Stream<Element>.Replay.Subscription] = []
@@ -25,7 +24,12 @@ extension Async.Stream.Replay {
         @usableFromInline
         init(bufferSize: Int) {
 
-            let capacity = try! Index<Element>.Count(max(1, bufferSize))
+            let capacity: Index<Element>.Count
+            do {
+                capacity = try Index<Element>.Count(max(1, bufferSize))
+            } catch {
+                preconditionFailure("a capacity of at least one is a valid count: \(error)")
+            }
             self.ring = Buffer::Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>
                 .Ring.Bounded(minimumCapacity: capacity)
         }

@@ -21,8 +21,7 @@ extension Async.Stream.Repeat.Interval {
         let clock: Clock.`Any`<Duration>
 
         @usableFromInline
-        init(value: sending Element, interval: Duration, count: Int?, clock: Clock.`Any`<Duration>)
-        {
+        init(value: sending Element, interval: Duration, count: Int?, clock: Clock.`Any`<Duration>) {
             self.clock = clock
             self.value = value
             self.interval = interval

@@ -68,11 +68,10 @@ extension Async.Stream.Buffer.Time.State {
             let result = await withTaskGroup(of: Async.Stream<Element>.Buffer.Time.Event.self) {
                 group in
                 group.addTask {
-                    if let element = await self.box.next() {
-                        return .element(element)
-                    } else {
+                    guard let element = await self.box.next() else {
                         return .upstreamComplete
                     }
+                    return .element(element)
                 }
 
                 group.addTask {

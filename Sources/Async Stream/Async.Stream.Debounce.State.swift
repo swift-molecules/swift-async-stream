@@ -48,11 +48,10 @@ extension Async.Stream.Debounce.State {
             let result = await withTaskGroup(of: Async.Stream<Element>.Debounce.Event.self) {
                 group in
                 group.addTask {
-                    if let element = await self.box.next() {
-                        return .element(element)
-                    } else {
+                    guard let element = await self.box.next() else {
                         return .upstreamComplete
                     }
+                    return .element(element)
                 }
 
                 if self.pending != nil {

@@ -37,6 +37,9 @@ extension Async.Stream.Replay.Cursor {
         if subscription == nil {
             subscription = await state.subscribe()
         }
-        return await subscription!.next()
+        guard let subscription else {
+            preconditionFailure("the cursor subscribed above")
+        }
+        return await subscription.next()
     }
 }
