@@ -1,6 +1,6 @@
-import _Concurrency
 public import Async
 internal import Ownership
+import _Concurrency
 
 extension Async {
 
