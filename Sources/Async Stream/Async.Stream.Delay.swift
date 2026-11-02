@@ -1,12 +1,12 @@
 public import Async
-internal import Clock_Concurrency
+public import Clock_Concurrency
 internal import Ownership
 
 extension Async.Stream {
 
     public func delay(
         _ duration: Duration,
-        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
+        clock: some Clock.Nonsending<Duration> = Swift::ContinuousClock()
     ) -> Self {
         let clock = Clock.`Any`(clock)
         return Self { [self] in

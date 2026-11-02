@@ -1,11 +1,11 @@
 public import Async
-internal import Clock_Concurrency
+public import Clock_Concurrency
 
 extension Async.Stream {
 
     public func throttle(
         _ duration: Duration,
-        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
+        clock: some Clock.Nonsending<Duration> = Swift::ContinuousClock()
     ) -> Self {
         Self { [self] in
             let state = Async.Stream<Element>.Throttle.State(

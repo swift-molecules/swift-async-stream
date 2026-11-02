@@ -1,5 +1,5 @@
 public import Async
-internal import Clock_Concurrency
+public import Clock_Concurrency
 
 extension Async.Stream {
 
@@ -19,7 +19,7 @@ extension Async.Stream {
         _ value: Element,
         every interval: Duration,
         count: Int? = nil,
-        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
+        clock: some Clock.Nonsending<Duration> = Swift::ContinuousClock()
     ) -> Self {
         Self {
             let state = Async.Stream<Element>.Repeat.Interval.State(

@@ -1,5 +1,5 @@
 public import Async
-internal import Clock_Concurrency
+public import Clock_Concurrency
 
 extension Async.Stream {
 
@@ -35,7 +35,7 @@ extension Async.Stream.Buffer {
 
     public func time(
         _ duration: Duration,
-        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
+        clock: some Clock.Nonsending<Duration> = Swift::ContinuousClock()
     ) -> Async.Stream<[Element]> {
         Async.Stream<[Element]> { [base] in
             let state = Async.Stream<Element>.Buffer.Time.State(
@@ -55,7 +55,7 @@ extension Async.Stream.Buffer {
     public func window(
         count: Int,
         time duration: Duration,
-        clock: some _Concurrency.Clock<Duration> = Swift::ContinuousClock()
+        clock: some Clock.Nonsending<Duration> = Swift::ContinuousClock()
     ) -> Async.Stream<[Element]> {
         Async.Stream<[Element]> { [base] in
             let state = Async.Stream<Element>.Buffer.Window.State(
