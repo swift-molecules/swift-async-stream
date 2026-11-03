@@ -1,0 +1,29 @@
+# swift-async-stream
+
+Use this package when you need to transform, combine, time or share an asynchronous sequence of `Sendable` values behind one concrete, non-throwing type. Start from `Async.Stream<Element>`: wrap any `AsyncSequence` with `Async.Stream.init(_:)`, or build one with `Async.Stream.from`, `Async.Stream.unfold`, `Async.Stream.generate`, `Async.Stream.interval` or `Async.Stream.timer`, then chain operators. To hand values from producers to a single consumer with backpressure, use `Async.Channel<Element>` from swift-async-channel; to deliver every value to many subscribers, use `Async.Broadcast<Element>` from swift-async-broadcast. This package bridges to both and builds `Async.Stream.share()`, `Async.Stream.replay(bufferSize:)` and `Async.Stream.Connectable` on top of `Async.Broadcast<Element>`.
+
+## Laws
+
+- A stream is cold. Every `makeAsyncIterator()` runs the pipeline again from its source. Only `Async.Stream.share()`, `Async.Stream.replay(bufferSize:)`, `Async.Stream.Connectable` and streams built from an `Async.Broadcast<Element>` or a channel receiver share one upstream.
+- A stream never throws. When a wrapped upstream sequence throws, iteration ends after the last value it delivered, and the error is discarded.
+- Cancellation ends a stream: it does not throw. The sources (`never`, `generate`, `unfold`, `repeating`, `interval`, `timer`) return `nil` once their task is cancelled. `Async.Stream.delay` drops the element it is holding when cancelled during the wait.
+- `Async.Stream.merge` keeps each input's order, but the order between inputs is unspecified. Its queue is unbounded. It finishes when every input has finished. A consumer that is cancelled while suspended is resumed with `nil`. Dropping the iterator cancels the tasks that drain the inputs. More than two inputs are merged pairwise.
+- `Async.Stream.zip` pulls both inputs concurrently and ends when either input ends. The element the other input produced in that same round is discarded.
+- `Async.Stream.Combine.latest` emits a pair on every update once both inputs have produced a value. It never conflates: every update is queued without bound. It ends when both inputs have finished.
+- `Async.Stream.Latest.from` emits only when the source produces. Source elements that arrive before the other stream's first value are dropped. It ends when the source ends.
+- `Async.Stream.Sample.on` emits the source's latest value on each trigger, so one value can repeat. Triggers that arrive before the source's first value are skipped. It ends when the trigger ends, or when a trigger arrives after the source finished without producing anything.
+- `Async.Stream.Map.flat` is sequential. It drains each inner stream completely before it pulls the next outer element.
+- `Async.Stream.debounce` is trailing-edge. It emits an element only after the given duration passes with no newer element. A pending element is emitted when the upstream finishes.
+- `Async.Stream.throttle` is leading-edge. It emits an element, then drops every element that arrives within the given duration of that emission. Dropped elements are never emitted later.
+- `Async.Stream.delay` waits after pulling each element. The delays are sequential, so consecutive elements are at least the given duration apart.
+- `Async.Stream.timeout` gives each element its own deadline, measured from the pull. If the deadline passes first, the stream ends, the same way it ends when the upstream completes.
+- `Async.Stream.interval` emits `0` immediately, then the next integer after each further duration.
+- `Async.Stream.Buffer.count` emits full batches, then any remaining partial batch when the upstream finishes. `Async.Stream.Buffer.time` emits one batch per duration, timed from each pull, and that batch is empty if nothing arrived. `Async.Stream.Buffer.window` emits when the count is reached or the duration has elapsed, whichever comes first, and never emits an empty batch. A count below one counts as one.
+- `Async.Stream.Transducer` calls `initial` once per iteration and `step` once per element. It calls `complete` exactly once, when the upstream finishes. Outputs are delivered in the order they are returned, the outputs of `complete` last.
+- `Async.Stream.Distinct.untilChanged` compares each element with the last element it emitted, not with every element it has seen.
+- `Async.Stream.Prefix.while` consumes the first element that fails the predicate and discards it. `Async.Stream.Drop.while` stops consulting its predicate after the first element that fails it.
+- `Async.Stream.last()` emits nothing for an empty stream.
+- `Async.Stream.share()` starts draining the upstream as soon as it is called. Each iterator receives only the elements sent after that iterator was created: nothing is replayed. The upstream is cancelled once the shared stream and all of its iterators are released.
+- `Async.Stream.replay(bufferSize:)` also starts draining the upstream as soon as it is called. It keeps the last `bufferSize` elements, or one element if `bufferSize` is less than one. An iterator subscribes on its first `next()`. It then receives the buffered elements followed by every later element, in order and without drops, from its own unbounded queue. A subscriber that arrives after the upstream finished receives the buffer and then the end. A cancelled consumer is resumed with `nil`. Dropping an iterator unsubscribes it. The upstream is cancelled once the replay stream and all of its iterators are released.
+- `Async.Stream.Connectable` sends nothing until `connect()` is called. Its `stream` subscribes when an iterator is created.
+- The `forward(to:)` methods and `Async.Stream.Connectable.connect()` finish their target (they close the sender or finish the broadcast) when the stream ends. Forwarding to a channel stops consuming at the first failed send.
