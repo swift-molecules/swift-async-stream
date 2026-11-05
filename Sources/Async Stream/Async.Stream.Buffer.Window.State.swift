@@ -12,7 +12,6 @@ import Memory_Allocator
 internal import Memory_Allocator
 import Memory_Allocator_Pool
 import Memory_Pool
-public import Ownership
 import Ownership_Shared_Primitive
 import Storage
 import Store
@@ -22,7 +21,7 @@ extension Async.Stream.Buffer.Window {
     @usableFromInline
     actor State {
         @usableFromInline
-        let box: Async.Stream<Element>.Iterator.Box<Async.Stream<Element>.Iterator>
+        let pull: Async.Stream<Element>.Pull
 
         @usableFromInline
         let count: Int
@@ -50,7 +49,9 @@ extension Async.Stream.Buffer.Window {
             clock: Clock.`Any`<Duration>
         ) {
             self.clock = clock
-            self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
+            self.pull = Async.Stream<Element>.Pull(
+                box: Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
+            )
             self.count = max(1, count)
             self.duration = duration
         }
@@ -65,7 +66,7 @@ extension Async.Stream.Buffer.Window.State {
             return nil
         }
 
-        let deadline = resolvedClock.now.advanced(by: duration)
+        var deadline = resolvedClock.now.advanced(by: duration)
 
         while true {
 
@@ -97,32 +98,16 @@ extension Async.Stream.Buffer.Window.State {
                 queue.drain { result.append($0) }
                 elementCount = 0
                 if result.isEmpty {
+                    // A window passed with no element. Start a fresh window
+                    // instead of looping on the expired deadline without
+                    // ever awaiting the upstream again.
+                    deadline = now.advanced(by: duration)
                     continue
                 }
                 return result
             }
 
-            let result = await withTaskGroup(of: Async.Stream<Element>.Buffer.Time.Event.self) {
-                group in
-                group.addTask {
-                    guard let element = await self.box.next() else {
-                        return .upstreamComplete
-                    }
-                    return .element(element)
-                }
-
-                group.addTask {
-
-                    try? await resolvedClock.sleep(until: resolvedClock.now.advanced(by: remaining))
-                    return .timerExpired
-                }
-
-                guard let first = await group.next() else {
-                    return Async.Stream<Element>.Buffer.Time.Event.upstreamComplete
-                }
-                group.cancelAll()
-                return first
-            }
+            let result = await pull.next(until: deadline, clock: resolvedClock)
 
             switch result {
             case .element(let element):

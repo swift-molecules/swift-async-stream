@@ -9,7 +9,6 @@ internal import Memory
 internal import Memory_Allocator
 internal import Memory_Allocator_Pool
 internal import Memory_Pool
-public import Ownership
 internal import Ownership_Shared_Primitive
 internal import Storage
 internal import Store
@@ -19,7 +18,7 @@ extension Async.Stream.Buffer.Time {
     @usableFromInline
     actor State {
         @usableFromInline
-        let box: Async.Stream<Element>.Iterator.Box<Async.Stream<Element>.Iterator>
+        let pull: Async.Stream<Element>.Pull
 
         @usableFromInline
         let duration: Duration
@@ -36,7 +35,9 @@ extension Async.Stream.Buffer.Time {
         @usableFromInline
         init(stream: Async.Stream<Element>, duration: Duration, clock: Clock.`Any`<Duration>) {
             self.clock = clock
-            self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
+            self.pull = Async.Stream<Element>.Pull(
+                box: Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
+            )
             self.duration = duration
         }
     }
@@ -65,27 +66,7 @@ extension Async.Stream.Buffer.Time.State {
                 return result
             }
 
-            let result = await withTaskGroup(of: Async.Stream<Element>.Buffer.Time.Event.self) {
-                group in
-                group.addTask {
-                    guard let element = await self.box.next() else {
-                        return .upstreamComplete
-                    }
-                    return .element(element)
-                }
-
-                group.addTask {
-
-                    try? await resolvedClock.sleep(until: resolvedClock.now.advanced(by: remaining))
-                    return .timerExpired
-                }
-
-                guard let first = await group.next() else {
-                    return Async.Stream<Element>.Buffer.Time.Event.upstreamComplete
-                }
-                group.cancelAll()
-                return first
-            }
+            let result = await pull.next(until: deadline, clock: resolvedClock)
 
             switch result {
             case .element(let element):

@@ -193,3 +193,125 @@ extension `Async streams preserve values across composed operations`
         #expect(count == 0)
     }
 }
+
+/// Runs `operation` in an unstructured task and returns its result, or nil
+/// when `limit` passes first. The operation is not awaited after the limit,
+/// so a stream that spins or hangs fails the test instead of hanging it.
+private func temporalResult<T: Sendable>(
+    within limit: Duration = .seconds(10),
+    _ operation: @escaping @Sendable () async -> T
+) async -> T? {
+    let (results, continuation) = AsyncStream<T?>.makeStream()
+    let worker = Task {
+        continuation.yield(await operation())
+    }
+    let timer = Task {
+        try? await Task.sleep(for: limit)
+        continuation.yield(nil)
+    }
+    var iterator = results.makeAsyncIterator()
+    let first = await iterator.next() ?? nil
+    worker.cancel()
+    timer.cancel()
+    continuation.finish()
+    return first
+}
+
+extension `Async streams preserve values across composed operations`
+    .`Stream operations preserve boundary behavior`
+{
+
+    @Test(.timeLimit(.minutes(1)))
+    func `Buffer window keeps pulling after a window passes with no element`() async {
+        let batches = await temporalResult {
+            let (raw, continuation) = AsyncStream<Int>.makeStream()
+            let producer = Task {
+                try? await Task.sleep(for: .milliseconds(200))
+                continuation.yield(1)
+                continuation.finish()
+            }
+            var batches: [[Int]] = []
+            for await batch in Async.Stream(raw).buffer.window(count: 10, time: .milliseconds(20)) {
+                batches.append(batch)
+            }
+            await producer.value
+            return batches
+        }
+        #expect(batches != nil)
+        #expect(batches == [[1]])
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func `Debounce of a merge delivers elements after the first timer expiry`() async {
+        let results = await temporalResult {
+            let (rawA, a) = AsyncStream<Int>.makeStream()
+            let (rawB, b) = AsyncStream<Int>.makeStream()
+            let producer = Task {
+                a.yield(1)
+                try? await Task.sleep(for: .milliseconds(300))
+                b.yield(2)
+                try? await Task.sleep(for: .milliseconds(300))
+                a.yield(3)
+                a.finish()
+                b.finish()
+            }
+            let stream = Async.Stream.merge(Async.Stream(rawA), Async.Stream(rawB))
+                .debounce(.milliseconds(50))
+            var results: [Int] = []
+            for await value in stream {
+                results.append(value)
+            }
+            await producer.value
+            return results
+        }
+        #expect(results == [1, 2, 3])
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func `Buffer time of a merge delivers elements after the first timer expiry`() async {
+        let results = await temporalResult {
+            let (rawA, a) = AsyncStream<Int>.makeStream()
+            let (rawB, b) = AsyncStream<Int>.makeStream()
+            let producer = Task {
+                a.yield(1)
+                try? await Task.sleep(for: .milliseconds(300))
+                b.yield(2)
+                a.finish()
+                b.finish()
+            }
+            let stream = Async.Stream.merge(Async.Stream(rawA), Async.Stream(rawB))
+                .buffer.time(.milliseconds(50))
+            var results: [Int] = []
+            for await batch in stream {
+                results.append(contentsOf: batch)
+            }
+            await producer.value
+            return results
+        }
+        #expect(results == [1, 2])
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func `Buffer window of a merge delivers elements after the first timer expiry`() async {
+        let results = await temporalResult {
+            let (rawA, a) = AsyncStream<Int>.makeStream()
+            let (rawB, b) = AsyncStream<Int>.makeStream()
+            let producer = Task {
+                a.yield(1)
+                try? await Task.sleep(for: .milliseconds(300))
+                b.yield(2)
+                a.finish()
+                b.finish()
+            }
+            let stream = Async.Stream.merge(Async.Stream(rawA), Async.Stream(rawB))
+                .buffer.window(count: 10, time: .milliseconds(50))
+            var results: [Int] = []
+            for await batch in stream {
+                results.append(contentsOf: batch)
+            }
+            await producer.value
+            return results
+        }
+        #expect(results == [1, 2])
+    }
+}
