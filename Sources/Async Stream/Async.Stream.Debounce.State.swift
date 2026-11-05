@@ -1,13 +1,12 @@
 public import Async
 public import Clock_Concurrency
-public import Ownership
 
 extension Async.Stream.Debounce {
 
     @usableFromInline
     actor State {
         @usableFromInline
-        let box: Async.Stream<Element>.Iterator.Box<Async.Stream<Element>.Iterator>
+        let pull: Async.Stream<Element>.Pull
 
         @usableFromInline
         let duration: Duration
@@ -24,7 +23,9 @@ extension Async.Stream.Debounce {
         @usableFromInline
         init(stream: Async.Stream<Element>, duration: Duration, clock: Clock.`Any`<Duration>) {
             self.clock = clock
-            self.box = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
+            self.pull = Async.Stream<Element>.Pull(
+                box: Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
+            )
             self.duration = duration
         }
     }
@@ -45,31 +46,8 @@ extension Async.Stream.Debounce.State {
 
         while true {
 
-            let result = await withTaskGroup(of: Async.Stream<Element>.Debounce.Event.self) {
-                group in
-                group.addTask {
-                    guard let element = await self.box.next() else {
-                        return .upstreamComplete
-                    }
-                    return .element(element)
-                }
-
-                if self.pending != nil {
-                    group.addTask {
-
-                        try? await resolvedClock.sleep(
-                            until: resolvedClock.now.advanced(by: self.duration)
-                        )
-                        return .timerExpired
-                    }
-                }
-
-                guard let first = await group.next() else {
-                    return Async.Stream<Element>.Debounce.Event.upstreamComplete
-                }
-                group.cancelAll()
-                return first
-            }
+            let deadline = pending == nil ? nil : resolvedClock.now.advanced(by: duration)
+            let result = await pull.next(until: deadline, clock: resolvedClock)
 
             switch result {
             case .element(let element):
