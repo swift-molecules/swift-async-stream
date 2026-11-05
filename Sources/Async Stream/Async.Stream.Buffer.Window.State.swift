@@ -65,7 +65,7 @@ extension Async.Stream.Buffer.Window.State {
             return nil
         }
 
-        let deadline = resolvedClock.now.advanced(by: duration)
+        var deadline = resolvedClock.now.advanced(by: duration)
 
         while true {
 
@@ -97,6 +97,10 @@ extension Async.Stream.Buffer.Window.State {
                 queue.drain { result.append($0) }
                 elementCount = 0
                 if result.isEmpty {
+                    // A window passed with no element. Start a fresh window
+                    // instead of looping on the expired deadline without
+                    // ever awaiting the upstream again.
+                    deadline = now.advanced(by: duration)
                     continue
                 }
                 return result
