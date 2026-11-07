@@ -18,10 +18,12 @@ import Storage
 import Store
 
 extension Async.Stream.Map.Flat {
+
     public enum Latest {}
 }
 
 extension Async.Stream.Map.Flat.Latest {
+
     @usableFromInline
     actor State<U: Sendable> {
         @usableFromInline
@@ -46,6 +48,12 @@ extension Async.Stream.Map.Flat.Latest {
         var innerDone: Bool = true
 
         @usableFromInline
+        enum Transform {
+            case sync(@Sendable (Element) -> Async.Stream<U>)
+            case async(@Sendable (Element) async -> Async.Stream<U>)
+        }
+
+        @usableFromInline
         init(stream: Async.Stream<Element>, transform: Transform) {
             self.outerBox = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.transform = transform
@@ -55,16 +63,9 @@ extension Async.Stream.Map.Flat.Latest {
 
 extension Async.Stream.Map.Flat.Latest.State {
     @usableFromInline
-    enum Transform {
-        case sync(@Sendable (Element) -> Async.Stream<U>)
-        case async(@Sendable (Element) async -> Async.Stream<U>)
-    }
-}
-
-extension Async.Stream.Map.Flat.Latest.State {
-    @usableFromInline
     func next() async -> U? {
         while true {
+
             if !queue.isEmpty {
                 guard let element = queue.dequeue() else {
                     preconditionFailure("a non-empty queue dequeues an element")
