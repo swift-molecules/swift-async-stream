@@ -3,10 +3,7 @@ internal import Ownership
 import _Concurrency
 
 extension Async {
-
     public struct Stream<Element: Sendable>: AsyncSequence, Sendable {
-        public typealias AsyncIterator = Iterator
-
         @usableFromInline
         let _makeIterator: @Sendable () -> Iterator
 
@@ -18,10 +15,12 @@ extension Async {
 }
 
 extension Async.Stream {
+    public typealias AsyncIterator = Iterator
+}
 
+extension Async.Stream {
     public init<S: AsyncSequence & Sendable>(_ sequence: S) where S.Element == Element {
         self.init {
-
             let box = Async.Stream<Element>.Iterator.Box(sequence.makeAsyncIterator())
             return Iterator {
                 await box.next()
@@ -38,7 +37,6 @@ extension Async.Stream {
 }
 
 extension Async.Stream {
-
     public static var empty: Self {
         Self { Iterator { nil } }
     }
@@ -46,7 +44,6 @@ extension Async.Stream {
     public static var never: Self {
         Self {
             Iterator {
-
                 try? await Task.sleep(for: .seconds(Int64.max))
                 return nil
             }
