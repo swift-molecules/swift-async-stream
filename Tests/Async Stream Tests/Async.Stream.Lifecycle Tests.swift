@@ -212,7 +212,7 @@ extension `Async streams preserve values across composed operations`
                 await Task.yield()
             }
 
-            for value in 0..<elementCount {
+            (0..<elementCount).forEach { value in
                 continuation.yield(value)
             }
             continuation.finish()
