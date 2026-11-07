@@ -1,5 +1,4 @@
 public import Async
-public import Ownership
 
 extension Async.Stream {
 
@@ -19,9 +18,4 @@ extension Async.Stream.Iterator {
     public func next() async -> Element? {
         await _next()
     }
-}
-
-extension Async.Stream.Iterator {
-
-    public typealias Box<I: AsyncIteratorProtocol> = Ownership.Mutable<I>.Unchecked
 }

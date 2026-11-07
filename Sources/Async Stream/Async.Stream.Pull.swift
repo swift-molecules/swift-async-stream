@@ -3,6 +3,7 @@ public import Clock_Concurrency
 public import Ownership
 
 extension Async.Stream {
+
     /// Pulls an upstream iterator for an operator that races each pull against a timer.
     ///
     /// One pull task at a time calls `box.next()`. When the timer wins the race, that pull
@@ -11,6 +12,13 @@ extension Async.Stream {
     /// Cancelling the consumer's task cancels the pull and ends the upstream.
     @usableFromInline
     actor Pull {
+        @usableFromInline
+        enum Outcome: Sendable {
+            case element(Element)
+            case timerExpired
+            case upstreamComplete
+        }
+
         @usableFromInline
         let box: Async.Stream<Element>.Iterator.Box<Async.Stream<Element>.Iterator>
 
@@ -45,15 +53,7 @@ extension Async.Stream {
 }
 
 extension Async.Stream.Pull {
-    @usableFromInline
-    enum Outcome: Sendable {
-        case element(Element)
-        case timerExpired
-        case upstreamComplete
-    }
-}
 
-extension Async.Stream.Pull {
     /// Returns the next upstream result, or `.timerExpired` when `deadline` passes first.
     ///
     /// With no deadline, it waits for the upstream only.
