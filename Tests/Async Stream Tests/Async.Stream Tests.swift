@@ -2,15 +2,25 @@ import Async
 import Async_Stream
 import Testing
 
-@Suite
-struct `Async streams preserve values across composed operations` {
+enum `Async.Stream Tests` {}
+
+extension `Async.Stream Tests` {
+    @Suite
+    struct `Async streams preserve values across composed operations` {
+    }
+}
+
+extension `Async.Stream Tests`.`Async streams preserve values across composed operations` {
     @Suite struct `Stream operations preserve their basic behavior` {}
+
     @Suite struct `Stream operations preserve boundary behavior` {}
+
     @Suite struct `Stream operations compose with their dependencies` {}
+
     @Suite(.serialized) struct `Stream operations preserve values during repeated execution` {}
 }
 
-extension `Async streams preserve values across composed operations`
+extension `Async.Stream Tests`.`Async streams preserve values across composed operations`
     .`Stream operations preserve their basic behavior`
 {
 

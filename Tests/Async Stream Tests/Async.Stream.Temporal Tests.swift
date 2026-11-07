@@ -3,7 +3,7 @@ import Async_Stream
 import Clock_Concurrency
 import Testing
 
-extension `Async streams preserve values across composed operations`
+extension `Async.Stream Tests`.`Async streams preserve values across composed operations`
     .`Stream operations preserve their basic behavior`
 {
 
@@ -217,7 +217,7 @@ private func temporalResult<T: Sendable>(
     return first
 }
 
-extension `Async streams preserve values across composed operations`
+extension `Async.Stream Tests`.`Async streams preserve values across composed operations`
     .`Stream operations preserve boundary behavior`
 {
 

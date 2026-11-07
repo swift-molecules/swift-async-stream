@@ -13,7 +13,7 @@ extension Counter {
     }
 }
 
-extension `Async streams preserve values across composed operations`
+extension `Async.Stream Tests`.`Async streams preserve values across composed operations`
     .`Stream operations preserve their basic behavior`
 {
 

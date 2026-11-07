@@ -2,7 +2,7 @@ import Async
 import Async_Stream
 import Testing
 
-extension `Async streams preserve values across composed operations`
+extension `Async.Stream Tests`.`Async streams preserve values across composed operations`
     .`Stream operations preserve their basic behavior`
 {
 
