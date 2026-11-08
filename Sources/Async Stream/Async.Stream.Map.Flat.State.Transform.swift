@@ -1,7 +1,6 @@
 public import Async
 import Ownership
 
-
 extension Async.Stream.Map.Flat.State {
     @usableFromInline
     enum Transform {

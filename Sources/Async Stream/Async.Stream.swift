@@ -1,7 +1,7 @@
 public import Async
+public import Clock_Concurrency
 internal import Ownership
 import _Concurrency
-public import Clock_Concurrency
 
 extension Async {
     public struct Stream<Element: Sendable>: AsyncSequence, Sendable {

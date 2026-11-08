@@ -14,7 +14,6 @@ internal import Standard_Library_Extensions
 import Storage
 import Store
 
-
 extension Async.Stream.Map.Flat.Latest.State {
     @usableFromInline
     enum Transform {
