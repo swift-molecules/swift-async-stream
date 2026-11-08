@@ -1,6 +1,6 @@
 public import Async
-public import Clock_Concurrency
-public import Ownership
+import Clock_Concurrency
+import Ownership
 
 
 extension Async.Stream.Pull {
