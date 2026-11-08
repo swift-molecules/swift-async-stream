@@ -1,5 +1,5 @@
 public import Async
-public import Ownership
+import Ownership
 
 
 extension Async.Stream.Map.Flat.State {
