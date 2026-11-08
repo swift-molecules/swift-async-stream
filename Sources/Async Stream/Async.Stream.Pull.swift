@@ -45,12 +45,6 @@ extension Async.Stream {
 }
 
 extension Async.Stream.Pull {
-    @usableFromInline
-    enum Outcome: Sendable {
-        case element(Element)
-        case timerExpired
-        case upstreamComplete
-    }
 }
 
 extension Async.Stream.Pull {

@@ -54,11 +54,6 @@ extension Async.Stream.Map.Flat.Latest {
 }
 
 extension Async.Stream.Map.Flat.Latest.State {
-    @usableFromInline
-    enum Transform {
-        case sync(@Sendable (Element) -> Async.Stream<U>)
-        case async(@Sendable (Element) async -> Async.Stream<U>)
-    }
 }
 
 extension Async.Stream.Map.Flat.Latest.State {
