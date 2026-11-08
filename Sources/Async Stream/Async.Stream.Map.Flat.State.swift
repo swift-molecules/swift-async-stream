@@ -2,7 +2,6 @@ public import Async
 public import Ownership
 
 extension Async.Stream.Map.Flat {
-
     @usableFromInline
     actor State<U: Sendable> {
         @usableFromInline
@@ -15,12 +14,6 @@ extension Async.Stream.Map.Flat {
         var innerBox: Async.Stream<Element>.Iterator.Box<Async.Stream<U>.Iterator>?
 
         @usableFromInline
-        enum Transform {
-            case sync(@Sendable (Element) -> Async.Stream<U>)
-            case async(@Sendable (Element) async -> Async.Stream<U>)
-        }
-
-        @usableFromInline
         init(stream: Async.Stream<Element>, transform: Transform) {
             self.outerBox = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
             self.transform = transform
@@ -30,9 +23,16 @@ extension Async.Stream.Map.Flat {
 
 extension Async.Stream.Map.Flat.State {
     @usableFromInline
+    enum Transform {
+        case sync(@Sendable (Element) -> Async.Stream<U>)
+        case async(@Sendable (Element) async -> Async.Stream<U>)
+    }
+}
+
+extension Async.Stream.Map.Flat.State {
+    @usableFromInline
     func next() async -> U? {
         while true {
-
             if let inner = innerBox, let element = await inner.next() {
                 return element
             }
