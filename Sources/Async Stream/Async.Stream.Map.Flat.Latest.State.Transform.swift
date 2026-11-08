@@ -11,7 +11,7 @@ import Memory_Allocator
 internal import Memory_Allocator
 import Memory_Allocator_Pool
 import Memory_Pool
-public import Ownership
+import Ownership
 import Ownership_Shared_Primitive
 internal import Standard_Library_Extensions
 import Storage
