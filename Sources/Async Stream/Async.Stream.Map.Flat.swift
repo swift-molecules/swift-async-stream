@@ -52,12 +52,12 @@ extension Async.Stream.Map.Flat {
         _ transform: @escaping @Sendable (Element) -> Async.Stream<U>
     ) -> Async.Stream<U> {
         Async.Stream<U> { [base] in
-            let state = Async.Stream<Element>.Map.Flat.Latest.State<U>(
-                stream: base,
+            let cursor = Async.Stream<Element>.Map.Flat.Latest.Cursor<U>(
+                base: base,
                 transform: .sync(transform)
             )
             return Async.Stream<U>.Iterator {
-                await state.next()
+                await cursor.next()
             }
         }
     }
@@ -66,12 +66,12 @@ extension Async.Stream.Map.Flat {
         _ transform: @escaping @Sendable (Element) async -> Async.Stream<U>
     ) -> Async.Stream<U> {
         Async.Stream<U> { [base] in
-            let state = Async.Stream<Element>.Map.Flat.Latest.State<U>(
-                stream: base,
+            let cursor = Async.Stream<Element>.Map.Flat.Latest.Cursor<U>(
+                base: base,
                 transform: .async(transform)
             )
             return Async.Stream<U>.Iterator {
-                await state.next()
+                await cursor.next()
             }
         }
     }

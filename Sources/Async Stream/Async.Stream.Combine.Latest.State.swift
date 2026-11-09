@@ -38,6 +38,9 @@ extension Async.Stream.Combine {
         var bComplete = false
 
         @usableFromInline
+        var cancelled = false
+
+        @usableFromInline
         init() {}
     }
 }
@@ -96,12 +99,35 @@ extension Async.Stream.Combine.State {
             return element
         }
 
-        if aComplete && bComplete {
+        if cancelled || (aComplete && bComplete) {
             return nil
         }
 
-        return await withCheckedContinuation { cont in
-            continuation = cont
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { (cont: CheckedContinuation<(A, B)?, Never>) in
+                registerContinuation(cont)
+            }
+        } onCancel: {
+            Task { await self.cancelPendingReceive() }
+        }
+    }
+
+    @usableFromInline
+    func registerContinuation(_ cont: CheckedContinuation<(A, B)?, Never>) {
+        if Task.isCancelled {
+            cancelled = true
+            cont.resume(returning: nil)
+            return
+        }
+        continuation = cont
+    }
+
+    @usableFromInline
+    func cancelPendingReceive() {
+        cancelled = true
+        if let cont = continuation {
+            continuation = nil
+            cont.resume(returning: nil)
         }
     }
 }

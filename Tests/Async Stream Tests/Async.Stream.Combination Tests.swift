@@ -138,21 +138,28 @@ extension `Async.Stream Tests`.`Async streams preserve values across composed op
         #expect(results[1].0 == 2 && results[1].1 == "b")
     }
 
-    @Test
+    @Test(.timeLimit(.minutes(2)))
     func `FlatMapLatest switches to latest inner stream`() async {
+        let (rawOuter, outer) = AsyncStream<Int>.makeStream()
+        let (rawFirst, first) = AsyncStream<Int>.makeStream()
+        first.yield(1)
 
-        let stream = Async.Stream.from([1, 2, 3])
+        let stream = Async.Stream(rawOuter)
             .map.flat.latest { n in
-                Async.Stream.from([n, n * 10])
+                n == 1 ? Async.Stream(rawFirst) : Async.Stream.from([n, n * 10])
             }
+        let iterator = stream.makeAsyncIterator()
 
         var results: [Int] = []
-        for await value in stream {
+        outer.yield(1)
+        if let value = await iterator.next() { results.append(value) }
+        outer.yield(3)
+        outer.finish()
+        while let value = await iterator.next() {
             results.append(value)
         }
 
-        #expect(results.contains(3))
-        #expect(results.contains(30))
+        #expect(results == [1, 3, 30])
     }
 
     @Test

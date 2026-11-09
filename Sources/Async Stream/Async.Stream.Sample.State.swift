@@ -10,23 +10,13 @@ extension Async.Stream.Sample {
         var latest: Element?
 
         @usableFromInline
-        var sourceTask: Task<Void, Never>?
-
-        @usableFromInline
         var triggerBox: Async.Stream<Element>.Iterator.Box<Async.Stream<Trigger>.Iterator>
 
         @usableFromInline
         var sourceDone: Bool = false
 
         @usableFromInline
-        var started: Bool = false
-
-        @usableFromInline
-        let source: Async.Stream<Element>
-
-        @usableFromInline
-        init(source: Async.Stream<Element>, trigger: Async.Stream<Trigger>) {
-            self.source = source
+        init(trigger: Async.Stream<Trigger>) {
             self.triggerBox = Async.Stream<Element>.Iterator.Box(trigger.makeAsyncIterator())
         }
     }
@@ -34,39 +24,19 @@ extension Async.Stream.Sample {
 
 extension Async.Stream.Sample.State {
     @usableFromInline
-    func startSourceTask() {
-        guard !started else { return }
-        started = true
-
-        let source = self.source
-        sourceTask = Task { [self] in
-            await run { state in
-                for await element in source {
-                    await state.updateLatest(element)
-                }
-                await state.markSourceDone()
-            }
-        }
-    }
-
-    @usableFromInline
-    func updateLatest(_ element: sending Element) async {
+    func updateLatest(_ element: sending Element) {
         latest = element
     }
 
     @usableFromInline
-    func markSourceDone() async {
+    func markSourceDone() {
         sourceDone = true
     }
 
     @usableFromInline
     func next() async -> Element? {
-        startSourceTask()
-
         while true {
-
             guard await triggerBox.next() != nil else {
-                sourceTask?.cancel()
                 return nil
             }
 

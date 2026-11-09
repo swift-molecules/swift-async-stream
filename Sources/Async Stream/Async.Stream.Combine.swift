@@ -45,13 +45,14 @@ extension Async.Stream.Combine {
                 }
             }
 
+            let cursor = Async.Stream<(Element, Other)>.Combine.Cursor(
+                state: state,
+                task1: task1,
+                task2: task2
+            )
+
             return Async.Stream<(Element, Other)>.Iterator {
-                let result = await state.receive()
-                if result == nil {
-                    task1.cancel()
-                    task2.cancel()
-                }
-                return result
+                await cursor.next()
             }
         }
     }

@@ -8,7 +8,6 @@ import Memory
 import Memory_Allocator
 import Memory_Allocator_Pool
 import Memory_Pool
-public import Ownership
 import Ownership_Shared_Primitive
 internal import Standard_Library_Extensions
 import Storage
@@ -22,13 +21,10 @@ extension Async.Stream.Map.Flat.Latest {
     @usableFromInline
     actor State<U: Sendable> {
         @usableFromInline
-        let outerBox: Async.Stream<Element>.Iterator.Box<Async.Stream<Element>.Iterator>
-
-        @usableFromInline
-        let transform: Transform
-
-        @usableFromInline
         var innerTask: Task<Void, Never>?
+
+        @usableFromInline
+        var generation: Int = 0
 
         @usableFromInline
         var queue: Queue<U> = .init()
@@ -40,66 +36,39 @@ extension Async.Stream.Map.Flat.Latest {
         var outerDone: Bool = false
 
         @usableFromInline
-        var innerDone: Bool = true
+        var innerActive: Bool = false
 
         @usableFromInline
-        init(stream: Async.Stream<Element>, transform: Transform) {
-            self.outerBox = Async.Stream<Element>.Iterator.Box(stream.makeAsyncIterator())
-            self.transform = transform
-        }
+        var cancelled: Bool = false
+
+        @usableFromInline
+        init() {}
     }
 }
 
 extension Async.Stream.Map.Flat.Latest.State {
-}
-
-extension Async.Stream.Map.Flat.Latest.State {
+    /// Cancels the current inner stream and starts forwarding `stream` instead.
     @usableFromInline
-    func next() async -> U? {
-        while true {
-            if !queue.isEmpty {
-                guard let element = queue.dequeue() else {
-                    preconditionFailure("a non-empty queue dequeues an element")
-                }
-                return element
+    func switchInner(to stream: Async.Stream<U>) {
+        guard !cancelled else { return }
+
+        innerTask?.cancel()
+        generation += 1
+        innerActive = true
+
+        let current = generation
+        innerTask = Task { [self] in
+            for await element in stream {
+                receiveInner(element, generation: current)
             }
-
-            if innerDone && outerDone {
-                return nil
-            }
-
-            if innerDone {
-                guard let outerElement = await outerBox.next() else {
-                    outerDone = true
-                    return nil
-                }
-
-                innerTask?.cancel()
-                innerDone = false
-
-                let innerStream: Async.Stream<U>
-                switch transform {
-                case .sync(let f): innerStream = f(outerElement)
-                case .async(let f): innerStream = await f(outerElement)
-                }
-                innerTask = Task { [self] in
-                    await run { state in
-                        for await innerElement in innerStream {
-                            await state.receiveInner(innerElement)
-                        }
-                        await state.markInnerDone()
-                    }
-                }
-            }
-
-            return await withCheckedContinuation { cont in
-                self.continuation = cont
-            }
+            finishInner(generation: current)
         }
     }
 
     @usableFromInline
-    func receiveInner(_ element: sending U) async {
+    func receiveInner(_ element: sending U, generation current: Int) {
+        guard !cancelled, current == generation else { return }
+
         if let cont = continuation {
             continuation = nil
             cont.resume(returning: element)
@@ -109,11 +78,66 @@ extension Async.Stream.Map.Flat.Latest.State {
     }
 
     @usableFromInline
-    func markInnerDone() async {
-        innerDone = true
+    func finishInner(generation current: Int) {
+        guard current == generation else { return }
+        innerActive = false
+        resumeIfFinished()
+    }
+
+    @usableFromInline
+    func finishOuter() {
+        outerDone = true
+        resumeIfFinished()
+    }
+
+    @usableFromInline
+    func resumeIfFinished() {
+        if outerDone && !innerActive, let cont = continuation {
+            continuation = nil
+            cont.resume(returning: nil)
+        }
+    }
+
+    @usableFromInline
+    func next() async -> U? {
+        if !queue.isEmpty {
+            guard let element = queue.dequeue() else {
+                preconditionFailure("a non-empty queue dequeues an element")
+            }
+            return element
+        }
+
+        if cancelled || (outerDone && !innerActive) {
+            return nil
+        }
+
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { (cont: CheckedContinuation<U?, Never>) in
+                registerContinuation(cont)
+            }
+        } onCancel: {
+            Task { await self.cancel() }
+        }
+    }
+
+    @usableFromInline
+    func registerContinuation(_ cont: CheckedContinuation<U?, Never>) {
+        if Task.isCancelled {
+            cancel()
+            cont.resume(returning: nil)
+            return
+        }
+        continuation = cont
+    }
+
+    /// Ends the stream for good: cancels the inner task and resumes a waiting consumer with `nil`.
+    @usableFromInline
+    func cancel() {
+        cancelled = true
+        innerTask?.cancel()
+        innerTask = nil
         if let cont = continuation {
             continuation = nil
-
             cont.resume(returning: nil)
         }
     }

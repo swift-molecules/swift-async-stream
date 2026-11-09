@@ -16,7 +16,7 @@ import Store
 
 extension Async.Stream.Map.Flat.Latest.State {
     @usableFromInline
-    enum Transform {
+    enum Transform: Sendable {
         case sync(@Sendable (Element) -> Async.Stream<U>)
         case async(@Sendable (Element) async -> Async.Stream<U>)
     }

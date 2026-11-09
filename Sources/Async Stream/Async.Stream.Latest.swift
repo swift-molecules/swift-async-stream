@@ -24,9 +24,15 @@ extension Async.Stream.Latest {
         _ other: Async.Stream<Other>
     ) -> Async.Stream<(Element, Other)> {
         Async.Stream<(Element, Other)> { [base] in
-            let state = Async.Stream<Element>.Latest.State<Other>(source: base, other: other)
+            let state = Async.Stream<Element>.Latest.State<Other>(source: base)
+            let otherTask = Task {
+                for await element in other {
+                    await state.updateLatestOther(element)
+                }
+            }
+            let cursor = Async.Stream<Element>.Latest.Cursor(state: state, otherTask: otherTask)
             return Async.Stream<(Element, Other)>.Iterator {
-                await state.next()
+                await cursor.next()
             }
         }
     }

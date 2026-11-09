@@ -111,6 +111,168 @@ extension `Async.Stream Tests`.`Async streams preserve values across composed op
     }
 
     @Test(.timeLimit(.minutes(2)))
+    func `FlatMapLatest switches to the newest inner stream and cancels the previous one`()
+        async throws
+    {
+        let flag = `Lifecycle Flag`()
+        let (rawOuter, outer) = AsyncStream<Int>.makeStream()
+        let (rawFirst, first) = AsyncStream<Int>.makeStream()
+        first.onTermination = { _ in Task { await flag.set() } }
+        first.yield(1)
+
+        let stream = Async.Stream(rawOuter).map.flat.latest { n in
+            n == 1 ? Async.Stream(rawFirst) : Async.Stream.from([n, n * 10])
+        }
+        let iterator = stream.makeAsyncIterator()
+
+        outer.yield(1)
+        let head = await withDeadline { await iterator.next() }
+        outer.yield(2)
+        outer.finish()
+
+        let rest: [Int]? = await withDeadline {
+            var results: [Int] = []
+            while let value = await iterator.next() { results.append(value) }
+            return results
+        }
+
+        #expect(head == 1)
+        #expect(rest == [2, 20])
+        #expect(await flag.waitUntilSet())
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func `FlatMapLatest keeps going when an inner stream ends while the outer stream has more`()
+        async throws
+    {
+        let (rawOuter, outer) = AsyncStream<Int>.makeStream()
+        let (rawFirst, first) = AsyncStream<Int>.makeStream()
+        first.yield(1)
+
+        let stream = Async.Stream(rawOuter).map.flat.latest { n in
+            n == 1 ? Async.Stream(rawFirst) : Async.Stream.from([n])
+        }
+        let iterator = stream.makeAsyncIterator()
+
+        outer.yield(1)
+        let head = await withDeadline { await iterator.next() }
+
+        let waiting = Task { await iterator.next() }
+        for _ in 0..<1_000 { await Task.yield() }
+        first.finish()
+        for _ in 0..<1_000 { await Task.yield() }
+        outer.yield(2)
+        outer.finish()
+
+        let second = await withDeadline { await waiting.value }
+        let end = await withDeadline { await iterator.next() }
+
+        #expect(head == 1)
+        #expect(second == 2)
+        #expect(end == .some(nil))
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func `FlatMapLatest cancels the outer and inner tasks when its iterator is dropped`()
+        async throws
+    {
+        let outerFlag = `Lifecycle Flag`()
+        let innerFlag = `Lifecycle Flag`()
+        let (rawOuter, outer) = AsyncStream<Int>.makeStream()
+        outer.onTermination = { _ in Task { await outerFlag.set() } }
+        let (rawInner, inner) = AsyncStream<Int>.makeStream()
+        inner.onTermination = { _ in Task { await innerFlag.set() } }
+
+        do {
+            let stream = Async.Stream(rawOuter).map.flat.latest { _ in Async.Stream(rawInner) }
+            outer.yield(1)
+            inner.yield(1)
+            let iterator = stream.makeAsyncIterator()
+            _ = await iterator.next()
+        }
+
+        #expect(await outerFlag.waitUntilSet())
+        #expect(await innerFlag.waitUntilSet())
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func `CombineLatest resumes a suspended consumer instead of hanging when its task is cancelled`()
+        async throws
+    {
+        let (rawA, _) = AsyncStream<Int>.makeStream()
+        let (rawB, _) = AsyncStream<Int>.makeStream()
+        let combined = Async.Stream(rawA).combine.latest(Async.Stream(rawB))
+
+        let consumer = Task {
+            for await _ in combined {}
+        }
+
+        for _ in 0..<1_000 { await Task.yield() }
+        consumer.cancel()
+
+        let finished: Void? = await withDeadline { await consumer.value }
+        #expect(finished != nil)
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func `CombineLatest cancels both producer tasks when its iterator is dropped without exhausting`()
+        async throws
+    {
+        let flagA = `Lifecycle Flag`()
+        let flagB = `Lifecycle Flag`()
+
+        let (rawA, continuationA) = AsyncStream<Int>.makeStream()
+        continuationA.onTermination = { _ in Task { await flagA.set() } }
+        let (rawB, continuationB) = AsyncStream<Int>.makeStream()
+        continuationB.onTermination = { _ in Task { await flagB.set() } }
+
+        do {
+            let combined = Async.Stream(rawA).combine.latest(Async.Stream(rawB))
+            continuationA.yield(1)
+            continuationB.yield(2)
+            let iterator = combined.makeAsyncIterator()
+            _ = await iterator.next()
+        }
+
+        #expect(await flagA.waitUntilSet())
+        #expect(await flagB.waitUntilSet())
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func `Latest from cancels draining the other stream when its iterator is dropped`()
+        async throws
+    {
+        let flag = `Lifecycle Flag`()
+        let (rawSource, _) = AsyncStream<Int>.makeStream()
+        let (rawOther, other) = AsyncStream<Int>.makeStream()
+        other.onTermination = { _ in Task { await flag.set() } }
+
+        do {
+            let stream = Async.Stream(rawSource).latest.from(Async.Stream(rawOther))
+            _ = stream.makeAsyncIterator()
+        }
+
+        #expect(await flag.waitUntilSet())
+    }
+
+    @Test(.timeLimit(.minutes(2)))
+    func `Sample cancels draining the source stream when its iterator is dropped`()
+        async throws
+    {
+        let flag = `Lifecycle Flag`()
+        let (rawSource, source) = AsyncStream<Int>.makeStream()
+        source.onTermination = { _ in Task { await flag.set() } }
+        let (rawTrigger, _) = AsyncStream<Int>.makeStream()
+
+        do {
+            let stream = Async.Stream(rawSource).sample.on(Async.Stream(rawTrigger))
+            _ = stream.makeAsyncIterator()
+        }
+
+        #expect(await flag.waitUntilSet())
+    }
+
+    @Test(.timeLimit(.minutes(2)))
     func `Share cancels upstream forwarding once the shared stream is totally abandoned`()
         async throws
     {

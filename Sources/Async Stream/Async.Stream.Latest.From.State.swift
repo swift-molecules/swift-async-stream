@@ -13,57 +13,28 @@ extension Async.Stream.Latest {
         var sourceBox: Async.Stream<Element>.Iterator.Box<Async.Stream<Element>.Iterator>
 
         @usableFromInline
-        var otherTask: Task<Void, Never>?
-
-        @usableFromInline
-        var started: Bool = false
-
-        @usableFromInline
-        let other: Async.Stream<Other>
-
-        @usableFromInline
-        init(source: Async.Stream<Element>, other: Async.Stream<Other>) {
+        init(source: Async.Stream<Element>) {
             self.sourceBox = Async.Stream<Element>.Iterator.Box(source.makeAsyncIterator())
-            self.other = other
         }
     }
 }
 
 extension Async.Stream.Latest.State {
     @usableFromInline
-    func startOtherTask() {
-        guard !started else { return }
-        started = true
-
-        let other = self.other
-        otherTask = Task { [self] in
-            await run { state in
-                for await element in other {
-                    await state.updateLatestOther(element)
-                }
-            }
-        }
-    }
-
-    @usableFromInline
-    func updateLatestOther(_ element: sending Other) async {
+    func updateLatestOther(_ element: sending Other) {
         latestOther = element
     }
 
     @usableFromInline
     func next() async -> (Element, Other)? {
-        startOtherTask()
-
         while true {
             guard let element = await sourceBox.next() else {
-                otherTask?.cancel()
                 return nil
             }
 
             if let other = latestOther {
                 return (element, other)
             }
-
         }
     }
 }

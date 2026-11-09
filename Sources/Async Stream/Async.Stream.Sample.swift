@@ -21,9 +21,16 @@ extension Async.Stream.Sample {
         _ trigger: Async.Stream<Trigger>
     ) -> Async.Stream<Element> {
         Async.Stream<Element> { [base] in
-            let state = Async.Stream<Element>.Sample.State<Trigger>(source: base, trigger: trigger)
+            let state = Async.Stream<Element>.Sample.State<Trigger>(trigger: trigger)
+            let sourceTask = Task {
+                for await element in base {
+                    await state.updateLatest(element)
+                }
+                await state.markSourceDone()
+            }
+            let cursor = Async.Stream<Element>.Sample.Cursor(state: state, sourceTask: sourceTask)
             return Async.Stream<Element>.Iterator {
-                await state.next()
+                await cursor.next()
             }
         }
     }
